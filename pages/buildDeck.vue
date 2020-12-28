@@ -8,7 +8,7 @@
         </v-tabs>
         <div class="white">
           <v-radio-group mandatory row>
-            <v-layout row wrap>
+            <div class="d-flex flex-wrap flex-row">
               <v-flex
                 v-for="checkboxItem in checkboxItems"
                 :key="checkboxItem.color"
@@ -22,12 +22,12 @@
                   hide-details=""
                 ></v-radio>
               </v-flex>
-            </v-layout>
+            </div>
           </v-radio-group>
         </div>
         <v-form>
           <v-text-field
-            class="mt-2 red"
+            class="mt-2"
             solo
             append-icon="mdi-magnify"
             placeholder="ユニット名で検索"
@@ -35,15 +35,31 @@
         </v-form>
         <v-tabs-items v-model="tab">
           <v-tab-item>
-            <v-card>aaa</v-card>
+            <v-card>全てのカード</v-card>
           </v-tab-item>
           <v-tab-item>
-            <v-card>bbb</v-card>
+            <v-card>お気に入りカード</v-card>
           </v-tab-item>
         </v-tabs-items>
       </v-col>
       <v-col cols="12" sm="9">
-        <div class="text-h4">デッキ名</div>
+        <div class="d-flex justify-space-between">
+          <v-form
+            v-model="deckName"
+            class="w-20 d-flex align-center"
+            @submit.prevent
+          >
+            <v-text-field type="text" label="DeckName"></v-text-field>
+          </v-form>
+          <div class="d-flex align-center">
+            <div>
+              <v-btn class="primary" width="100" @click="shareDeck"
+                >ツイート</v-btn
+              >
+              <v-btn class="info" width="100" @click="saveDeck">保存</v-btn>
+            </div>
+          </div>
+        </div>
         <v-card class="overflow-auto" height="80vh">
           <v-row no-gutters>
             <v-col v-for="n of 50" :key="n" cols="2">
@@ -61,6 +77,7 @@ export default {
   data() {
     return {
       tab: null,
+      deckName: '',
       checkboxItems: [
         {
           name: '全',
@@ -104,6 +121,14 @@ export default {
         },
       ],
     }
+  },
+  methods: {
+    saveDeck() {
+      console.log('saved')
+    },
+    shareDeck() {
+      console.log('shared')
+    },
   },
 }
 </script>
