@@ -60,12 +60,14 @@
             </div>
           </div>
         </div>
-        <v-card class="overflow-auto" height="80vh">
-          <v-row no-gutters>
-            <v-col v-for="n of 50" :key="n" cols="2">
+        <v-card class="d-flex flex-wrap overflow-auto" height="80vh">
+          <!-- <v-card class="overflow-auto" height="80vh"> -->
+          <Card v-for="n of 50" :key="n"></Card>
+          <!-- <v-row no-gutters>
+            <v-col v-for="n of 50" :key="n" cols="1">
               <Card></Card>
             </v-col>
-          </v-row>
+          </v-row> -->
         </v-card>
       </v-col>
     </v-row>
