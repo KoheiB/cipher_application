@@ -11,20 +11,15 @@
               <v-card height="280" class="rounded-xl" nuxt to="buildDeck" hover>
                 <v-img
                   :src="require('@/static/img/B13/B13-005N.png')"
-                  max-height="75%"
+                  max-height="70%"
                   position="top"
                 ></v-img>
-                <v-card-title>aaa</v-card-title>
+                <v-card-title
+                  >紫無リン 〜ニニアンテティスを添えて〜</v-card-title
+                >
                 <v-fade-transition>
                   <v-overlay v-if="hover" absolute color="#036358">
-                    <div class="d-flex flex-column">
-                      <v-btn class="mt-4" @click.prevent
-                        >デッキを編集する</v-btn
-                      >
-                      <v-btn class="mt-4" @click.prevent
-                        >デッキを公開する</v-btn
-                      >
-                    </div>
+                    <v-icon x-large>mdi-square-edit-outline</v-icon>
                   </v-overlay>
                 </v-fade-transition>
               </v-card>
