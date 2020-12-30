@@ -7,19 +7,18 @@
           <v-tab><v-icon>mdi-bookmark-multiple</v-icon></v-tab>
         </v-tabs>
         <div class="white">
-          <v-radio-group mandatory row>
+          <v-radio-group v-model="selectedRadio" mandatory row>
             <div class="d-flex flex-wrap flex-row">
               <v-flex
-                v-for="checkboxItem in checkboxItems"
-                :key="checkboxItem.color"
+                v-for="radioItem in radioItems"
+                :key="radioItem.color"
                 md3
               >
                 <v-radio
-                  v-model="checkboxItem.checked"
-                  :name="checkboxItem.name"
-                  :label="checkboxItem.name"
-                  :color="checkboxItem.color"
-                  hide-details=""
+                  class="v-radio-wrapper"
+                  :name="radioItem.name"
+                  :label="radioItem.name"
+                  :color="radioItem.color"
                 ></v-radio>
               </v-flex>
             </div>
@@ -60,14 +59,8 @@
             </div>
           </div>
         </div>
-        <v-card class="d-flex flex-wrap overflow-auto" height="80vh">
-          <!-- <v-card class="overflow-auto" height="80vh"> -->
+        <v-card class="d-flex flex-wrap">
           <Card v-for="n of 50" :key="n"></Card>
-          <!-- <v-row no-gutters>
-            <v-col v-for="n of 50" :key="n" cols="1">
-              <Card></Card>
-            </v-col>
-          </v-row> -->
         </v-card>
       </v-col>
     </v-row>
@@ -80,7 +73,8 @@ export default {
     return {
       tab: null,
       deckName: '',
-      checkboxItems: [
+      selectedRadio: 0,
+      radioItems: [
         {
           name: '全',
           color: 'grey lighten-1',
@@ -134,3 +128,9 @@ export default {
   },
 }
 </script>
+
+<style>
+.v-radio-wrapper {
+  margin-bottom: 10px;
+}
+</style>
