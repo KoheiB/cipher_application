@@ -59,7 +59,7 @@
             </div>
           </div>
         </div>
-        <v-card class="d-flex flex-wrap">
+        <v-card class="d-flex flex-wrap" width="100%">
           <Card v-for="n of 50" :key="n"></Card>
         </v-card>
       </v-col>
