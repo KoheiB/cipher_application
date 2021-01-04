@@ -59,8 +59,22 @@
             </div>
           </div>
         </div>
-        <v-card class="d-flex flex-wrap" width="100%">
-          <Card v-for="n of 50" :key="n"></Card>
+        <v-card>
+          <draggable
+            v-model="cards"
+            class="d-flex flex-wrap"
+            group="cards"
+            :animation="200"
+            @start="drag = true"
+            @end="drag = false"
+            @change="onChange"
+          >
+            <Card
+              v-for="(card, i) in cards"
+              :key="i"
+              :image="card.image"
+            ></Card>
+          </draggable>
         </v-card>
       </v-col>
     </v-row>
@@ -68,7 +82,11 @@
 </template>
 
 <script>
+import draggable from 'vuedraggable'
 export default {
+  components: {
+    draggable,
+  },
   data() {
     return {
       tab: null,
@@ -116,6 +134,28 @@ export default {
           color: 'brown',
         },
       ],
+      cards: [
+        { image: require('@/static/img/S10/S10-001ST.png') },
+        { image: require('@/static/img/S10/S10-001ST.png') },
+        { image: require('@/static/img/S10/S10-001ST.png') },
+        { image: require('@/static/img/S10/S10-001ST.png') },
+        { image: require('@/static/img/S10/S10-002ST.png') },
+        { image: require('@/static/img/S10/S10-002ST.png') },
+        { image: require('@/static/img/S10/S10-002ST.png') },
+        { image: require('@/static/img/S10/S10-002ST.png') },
+        { image: require('@/static/img/S10/S10-003ST.png') },
+        { image: require('@/static/img/S10/S10-003ST.png') },
+        { image: require('@/static/img/S10/S10-003ST.png') },
+        { image: require('@/static/img/S10/S10-003ST.png') },
+        { image: require('@/static/img/S10/S10-004ST.png') },
+        { image: require('@/static/img/S10/S10-004ST.png') },
+        { image: require('@/static/img/S10/S10-004ST.png') },
+        { image: require('@/static/img/S10/S10-004ST.png') },
+        { image: require('@/static/img/S10/S10-005ST.png') },
+        { image: require('@/static/img/S10/S10-005ST.png') },
+        { image: require('@/static/img/S10/S10-005ST.png') },
+        { image: require('@/static/img/S10/S10-005ST.png') },
+      ],
     }
   },
   methods: {
@@ -124,6 +164,23 @@ export default {
     },
     shareDeck() {
       console.log('shared')
+    },
+    onChange(event) {
+      const imgUrl = event.moved.element.image
+      const newIndex = event.moved.newIndex
+      console.log(imgUrl)
+      const newArray = this.cards.map((card) => card)
+      const moveCardsArray = this.cards.filter((card) => {
+        return card.image === imgUrl
+      })
+      this.cards.forEach((card) => {
+        if (card.image === imgUrl) {
+        }
+      })
+      this.cards = newArray
+      this.cards = newArray.filter((card) => {
+        return card.image !== 'move'
+      })
     },
   },
 }
