@@ -67,13 +67,13 @@
             :animation="200"
             @start="drag = true"
             @end="drag = false"
-            @change="onChange"
+            @change="onMoveCard"
           >
-            <Card
+            <CardPicked
               v-for="(card, i) in cards"
               :key="i"
-              :image="card.image"
-            ></Card>
+              :img="card"
+            ></CardPicked>
           </draggable>
         </v-card>
       </v-col>
@@ -135,26 +135,26 @@ export default {
         },
       ],
       cards: [
-        { image: require('@/static/img/S10/S10-001ST.png') },
-        { image: require('@/static/img/S10/S10-001ST.png') },
-        { image: require('@/static/img/S10/S10-001ST.png') },
-        { image: require('@/static/img/S10/S10-001ST.png') },
-        { image: require('@/static/img/S10/S10-002ST.png') },
-        { image: require('@/static/img/S10/S10-002ST.png') },
-        { image: require('@/static/img/S10/S10-002ST.png') },
-        { image: require('@/static/img/S10/S10-002ST.png') },
-        { image: require('@/static/img/S10/S10-003ST.png') },
-        { image: require('@/static/img/S10/S10-003ST.png') },
-        { image: require('@/static/img/S10/S10-003ST.png') },
-        { image: require('@/static/img/S10/S10-003ST.png') },
-        { image: require('@/static/img/S10/S10-004ST.png') },
-        { image: require('@/static/img/S10/S10-004ST.png') },
-        { image: require('@/static/img/S10/S10-004ST.png') },
-        { image: require('@/static/img/S10/S10-004ST.png') },
-        { image: require('@/static/img/S10/S10-005ST.png') },
-        { image: require('@/static/img/S10/S10-005ST.png') },
-        { image: require('@/static/img/S10/S10-005ST.png') },
-        { image: require('@/static/img/S10/S10-005ST.png') },
+        require('@/static/img/S10/S10-001ST.png'),
+        require('@/static/img/S10/S10-001ST.png'),
+        require('@/static/img/S10/S10-001ST.png'),
+        require('@/static/img/S10/S10-001ST.png'),
+        require('@/static/img/S10/S10-002ST.png'),
+        require('@/static/img/S10/S10-002ST.png'),
+        require('@/static/img/S10/S10-002ST.png'),
+        require('@/static/img/S10/S10-002ST.png'),
+        require('@/static/img/S10/S10-003ST.png'),
+        require('@/static/img/S10/S10-003ST.png'),
+        require('@/static/img/S10/S10-003ST.png'),
+        require('@/static/img/S10/S10-003ST.png'),
+        require('@/static/img/S10/S10-004ST.png'),
+        require('@/static/img/S10/S10-004ST.png'),
+        require('@/static/img/S10/S10-004ST.png'),
+        require('@/static/img/S10/S10-004ST.png'),
+        require('@/static/img/S10/S10-005ST.png'),
+        require('@/static/img/S10/S10-005ST.png'),
+        require('@/static/img/S10/S10-005ST.png'),
+        require('@/static/img/S10/S10-005ST.png'),
       ],
     }
   },
@@ -165,22 +165,71 @@ export default {
     shareDeck() {
       console.log('shared')
     },
-    onChange(event) {
-      const imgUrl = event.moved.element.image
+    onMoveCard(event) {
       const newIndex = event.moved.newIndex
-      console.log(imgUrl)
-      const newArray = this.cards.map((card) => card)
-      const moveCardsArray = this.cards.filter((card) => {
-        return card.image === imgUrl
-      })
-      this.cards.forEach((card) => {
-        if (card.image === imgUrl) {
-        }
-      })
-      this.cards = newArray
-      this.cards = newArray.filter((card) => {
-        return card.image !== 'move'
-      })
+      const oldIndex = event.moved.oldIndex
+      const cardObjects = [] // obj{ img: String, count: Int}[]
+      const sortedCards = [] // string[]
+
+      if (newIndex > oldIndex) {
+        // 後ろにカードを移動した場合
+        this.cards.reverse()
+
+        // カードの配列を順番に見て、種類順の配列(cardObjects)にあるカードかどうか、オブジェクトのimgキーを参照して確認する。
+        this.cards.forEach((card) => {
+          const isCardInObjects = cardObjects.filter((obj) => {
+            return obj.img === card
+          })
+
+          if (isCardInObjects.length === 0) {
+            // 種類順の配列にない場合、カードのオブジェクトを種類順の配列の最後に追加する。
+            cardObjects.push({ img: card, count: 1 })
+          } else {
+            // 種類順の配列にある場合、該当のオブジェクトのcountを1枚増やす。
+            const objectIndex = cardObjects.findIndex((obj) => {
+              return obj.img === card
+            })
+            cardObjects[objectIndex].count++
+          }
+        })
+
+        cardObjects.reverse()
+
+        // 種類順の配列をカードに変換。
+        cardObjects.forEach((obj) => {
+          for (let i = 0; i < obj.count; ++i) {
+            sortedCards.push(obj.img)
+          }
+        })
+        this.cards = sortedCards
+      } else if (newIndex < oldIndex) {
+        // 前にカードを移動した場合
+        // カードの配列を順番に見て、種類順の配列(cardObjects)にあるカードかどうか、オブジェクトのimgキーを参照して確認する。
+        this.cards.forEach((card) => {
+          const isCardInObjects = cardObjects.filter((obj) => {
+            return obj.img === card
+          })
+
+          if (isCardInObjects.length === 0) {
+            // 種類順の配列にない場合、カードのオブジェクトを種類順の配列の最後に追加する。
+            cardObjects.push({ img: card, count: 1 })
+          } else {
+            // 種類順の配列にある場合、該当のオブジェクトのcountを1枚増やす。
+            const objectIndex = cardObjects.findIndex((obj) => {
+              return obj.img === card
+            })
+            cardObjects[objectIndex].count++
+          }
+        })
+
+        // 種類順の配列をカードに変換。
+        cardObjects.forEach((obj) => {
+          for (let i = 0; i < obj.count; ++i) {
+            sortedCards.push(obj.img)
+          }
+        })
+        this.cards = sortedCards
+      }
     },
   },
 }
