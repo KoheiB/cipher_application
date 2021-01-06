@@ -165,27 +165,39 @@ export default {
     shareDeck() {
       console.log('shared')
     },
+    // 1枚のカードをドラッグした際、同じ種類のカードの順序をまとめて入れ替えるためのメソッド
+    // 一旦、カードの配列を各カードの順序と枚数の情報に変換して並べなおす
     onMoveCard(event) {
       const newIndex = event.moved.newIndex
       const oldIndex = event.moved.oldIndex
-      const cardObjects = [] // obj{ img: String, count: Int}[]
-      const sortedCards = [] // string[]
+      
+      // 各カードがどの順で何枚入っているかを格納する配列
+      // obj{ img: String, count: Int}[]
+      const cardObjects = [] 
+      
+      // cardObjectsの内容をもとにカード情報をソートして格納する配列
+      // string[]
+      const sortedCards = []
 
-      if (newIndex > oldIndex) {
+      if (newIndex > oldIndex) {        
         // 後ろにカードを移動した場合
+        
+        // 配列の順序をreverseして、末尾から探索できるようにしておく
+        // これにより、ドラッグして移動したカードが元より後ろの順で検知される
         this.cards.reverse()
 
-        // カードの配列を順番に見て、種類順の配列(cardObjects)にあるカードかどうか、オブジェクトのimgキーを参照して確認する。
+        // カードの配列を末尾から探索
         this.cards.forEach((card) => {
+          // 種類順の配列(cardObjects)にあるカードかどうか、オブジェクトのimgキーを参照して確認する
           const isCardInObjects = cardObjects.filter((obj) => {
             return obj.img === card
           })
-
+          
           if (isCardInObjects.length === 0) {
-            // 種類順の配列にない場合、カードのオブジェクトを種類順の配列の最後に追加する。
+            // 新しい種類のカードの場合、カードのオブジェクトをcardObjectsに追加する
             cardObjects.push({ img: card, count: 1 })
           } else {
-            // 種類順の配列にある場合、該当のオブジェクトのcountを1枚増やす。
+            // 既存カードの場合、該当オブジェクトのcountを1増やす
             const objectIndex = cardObjects.findIndex((obj) => {
               return obj.img === card
             })
@@ -193,9 +205,10 @@ export default {
           }
         })
 
+        // 逆順にしたものを元の順に戻す
         cardObjects.reverse()
 
-        // 種類順の配列をカードに変換。
+        // 種類順の配列をカードに変換
         cardObjects.forEach((obj) => {
           for (let i = 0; i < obj.count; ++i) {
             sortedCards.push(obj.img)
@@ -204,17 +217,19 @@ export default {
         this.cards = sortedCards
       } else if (newIndex < oldIndex) {
         // 前にカードを移動した場合
-        // カードの配列を順番に見て、種類順の配列(cardObjects)にあるカードかどうか、オブジェクトのimgキーを参照して確認する。
+        
+        // カードの配列を頭から探索
         this.cards.forEach((card) => {
+          // 種類順の配列(cardObjects)にあるカードかどうか、オブジェクトのimgキーを参照して確認する
           const isCardInObjects = cardObjects.filter((obj) => {
             return obj.img === card
           })
 
           if (isCardInObjects.length === 0) {
-            // 種類順の配列にない場合、カードのオブジェクトを種類順の配列の最後に追加する。
+            // 新しい種類のカードの場合、カードのオブジェクトをcardObjectsに追加する
             cardObjects.push({ img: card, count: 1 })
           } else {
-            // 種類順の配列にある場合、該当のオブジェクトのcountを1枚増やす。
+            // 既存カードの場合、該当オブジェクトのcountを1増やす
             const objectIndex = cardObjects.findIndex((obj) => {
               return obj.img === card
             })
@@ -222,7 +237,7 @@ export default {
           }
         })
 
-        // 種類順の配列をカードに変換。
+        // 種類順の配列をカードに変換
         cardObjects.forEach((obj) => {
           for (let i = 0; i < obj.count; ++i) {
             sortedCards.push(obj.img)
