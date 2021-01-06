@@ -1,0 +1,28 @@
+- Users : collection
+    - userId : documentID
+        - userName : string
+        - password  : string <!-- 認証回りをfirestore authenticationに任すならこれ要らない？ -->
+        - markedOtherPlayersDecks : string
+        - Decks : collectionGroup
+            - deckId : documentID
+                - deckName : string
+                - inDeckCards : array[string]
+                - heroCard : string
+                - mainClassCangeCard : string
+                - markedCards : array[string]
+                - public? : boolean
+                - posting? : boolean
+                - comment : string
+                - createdAt : timestamp
+                - updatedAt : timestamp
+        - createdAt : timestamp
+        - updatedAt : timestamp
+
+- Cards : collectioon <!-- 一旦は検索条件に必要な最低限のカラムでいいのではという想定 -->
+    - cardId : documentID
+        - title : string
+        - unitName : string
+        - symbol1 : string
+        - symbol2 : string
+        - createdAt : timestamp
+        - updatedAt : timestamp
