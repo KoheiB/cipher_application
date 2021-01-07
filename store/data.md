@@ -8,7 +8,7 @@
                 - deckName : string
                 - inDeckCards : array[string]
                 - heroCard : string
-                - mainClassCangeCard : string
+                - mainClassChangeCard : string
                 - markedCards : array[string]
                 - public? : boolean
                 - posting? : boolean
