@@ -11,21 +11,66 @@
 - Users : Collection
     - userId : DocumentID
         - userName : String
-        - favoriteOtherPlayersDecks : Array[string] <!-- 自分がいいねした他人のdeckIdを格納する配列。deckIdではなくフィールドパスを持つことになる？ -->
         - Decks : SubCollection
             - deckId : DocumentID
                 - deckName : String
-                - inDeckCards : Array[string]
-                - heroCard : String
-                - mainClassChangeCard : String
-                - markCards : Array[string]
+                - inDeckCardIds : Array[string]
+                <!--
+                リストとサブコレのどっちにするか諸説あり、サブコレのほうが良い気がしてきた
+                サブコレの場合、Cardの基本情報が更新されることはないので、実体を書き写す方針（二重持ち）にする
+                - InDeckCards : SubCollection
+                  - inDeckCardId : DocumentId
+                    - title : String
+                    - unitName : String
+                    - symbol1 : String
+                    - symbol2 : String
+                    - createdAt : Timestamp
+                -->
+
+                - heroCardId : String
+                - mainClassChangeCardId : String
+                <!--
+                この2つもMapにしてCardの情報そのものをここに持たせたほうがよくね？                
+                - heroCard : Map
+                  - title : String
+                  - unitName : String
+                  - symbol1 : String
+                  - symbol2 : String
+                - mainClassChangeCard : Map
+                  - title : String
+                  - unitName : String
+                  - symbol1 : String
+                  - symbol2 : String 
+                -->
+
+                - markCardIds : Array[string]
+                <!--
+                inDeckCardIdsのコメントと同様
+
+                - MarkCards : SubCollection
+                  - MarkCardId : DocumentId
+                    - title : String
+                    - unitName : String
+                    - symbol1 : String
+                    - symbol2 : String
+                    - createdAt : Timestamp
+                -->
                 - isPublic : Boolean
                 - isPosting : Boolean
                 - comment : String
                 - favoritedCount : Number
-                - favoritedUsers : Array[string] <!-- このデッキをいいねしたユーザのuserIdを格納する配列 -->
+                - FavoritedUsers : SubCollection
+                  - favUserId : DocumentId
+                    - favUserRef : String <!-- Userの情報は書き換え頻度が多いと判断し、DocumentReferenceを持つ方針にする -->
+                    - createdAt : Timestamp
+                    - updatedAt : Timestamp
                 - createdAt : Timestamp
                 - updatedAt : Timestamp
+        - FavoriteDecks : SubCollection
+          - favDeckId : DocumentId
+            - favDeckRef : String <!-- Deckの情報は書き換え頻度が多いと判断し、DocumentReferenceを持つ方針にする -->
+            - createdAt : Timestamp
+            - updatedAt : Timestamp
         - createdAt : Timestamp
         - updatedAt : Timestamp
 
