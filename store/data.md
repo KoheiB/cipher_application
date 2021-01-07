@@ -10,7 +10,7 @@
                 - heroCard : string
                 - mainClassChangeCard : string
                 - markedCards : array[string]
-                - public? : boolean
+                - isPublic : boolean
                 - posting? : boolean
                 - comment : string
                 - createdAt : timestamp
