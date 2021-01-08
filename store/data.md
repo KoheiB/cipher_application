@@ -9,73 +9,69 @@
 　　ユーザ同士でいいねを登録　→　favorite
  -->
 - Users : Collection
-    - userId : DocumentID
+    - DocumentId : random
         - userName : String
         - Decks : SubCollection
-            - deckId : DocumentID
+            - DocumentID : random
                 - deckName : String
+                <!-- 諸説
                 - inDeckCardIds : Array[string]
-                <!--
-                リストとサブコレのどっちにするか諸説あり、サブコレのほうが良い気がしてきた
-                サブコレの場合、Cardの基本情報が更新されることはないので、実体を書き写す方針（二重持ち）にする
-                - InDeckCards : SubCollection
-                  - inDeckCardId : DocumentId
+                -->
+                - UseCards : SubCollection <!-- 動詞 + 名詞 のほうがよくないか？と思いUseに変えました -->
+                  - DocumentId : Cards.DocumentId
+                    - cardId : String
                     - title : String
                     - unitName : String
                     - symbol1 : String
                     - symbol2 : String
-                    - createdAt : Timestamp
-                -->
+                    - count : Number
+                    - displayOrder : Number
 
-                - heroCardId : String
-                - mainClassChangeCardId : String
-                <!--
-                この2つもMapにしてCardの情報そのものをここに持たせたほうがよくね？                
                 - heroCard : Map
+                  - cardId : String
                   - title : String
                   - unitName : String
                   - symbol1 : String
                   - symbol2 : String
                 - mainClassChangeCard : Map
+                  - cardId : String
                   - title : String
                   - unitName : String
                   - symbol1 : String
                   - symbol2 : String 
-                -->
 
+                <!-- 諸説
                 - markCardIds : Array[string]
-                <!--
-                inDeckCardIdsのコメントと同様
-
+                -->
                 - MarkCards : SubCollection
-                  - MarkCardId : DocumentId
+                  - DocumentId : Cards.DocumentId
+                    - cardId : String
                     - title : String
                     - unitName : String
                     - symbol1 : String
                     - symbol2 : String
-                    - createdAt : Timestamp
-                -->
+                    - count : Number
+                    - displayOrder : Number
+
                 - isPublic : Boolean
-                - isPosting : Boolean
+                - isPosted : Boolean
                 - comment : String
                 - favoritedCount : Number
                 - FavoritedUsers : SubCollection
-                  - favUserId : DocumentId
+                  - DocumentId : random
                     - favUserRef : String <!-- Userの情報は書き換え頻度が多いと判断し、DocumentReferenceを持つ方針にする -->
                     - createdAt : Timestamp
-                    - updatedAt : Timestamp
                 - createdAt : Timestamp
                 - updatedAt : Timestamp
         - FavoriteDecks : SubCollection
-          - favDeckId : DocumentId
+          - DocumentId : random
             - favDeckRef : String <!-- Deckの情報は書き換え頻度が多いと判断し、DocumentReferenceを持つ方針にする -->
             - createdAt : Timestamp
-            - updatedAt : Timestamp
         - createdAt : Timestamp
         - updatedAt : Timestamp
 
 - Cards : Collectioon <!-- 一旦は検索条件に必要な最低限のカラムだけにする -->
-    - cardId : DocumentID
+    - DocumentId : cardId + rare (ex.B01-001SR+)
         - title : String
         - unitName : String
         - symbol1 : String
