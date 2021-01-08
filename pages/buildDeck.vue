@@ -171,14 +171,6 @@ export default {
       const newIndex = event.moved.newIndex
       const oldIndex = event.moved.oldIndex
 
-      // 各カードがどの順で何枚入っているかを格納する配列
-      // obj{ img: String, count: Int}[]
-      const cardObjects = []
-
-      // cardObjectsの内容をもとにカード情報をソートして格納する配列
-      // string[]
-      const sortedCards = []
-
       if (newIndex > oldIndex) {
         // 後ろにカードを移動した場合
 
@@ -186,65 +178,53 @@ export default {
         // これにより、ドラッグして移動したカードが元より後ろの順で検知される
         this.cards.reverse()
 
-        // カードの配列を末尾から探索
-        this.cards.forEach((card) => {
-          // 種類順の配列(cardObjects)にあるカードかどうか、オブジェクトのimgキーを参照して確認する
-          const isCardInObjects = cardObjects.filter((obj) => {
-            return obj.img === card
-          })
-
-          if (isCardInObjects.length === 0) {
-            // 新しい種類のカードの場合、カードのオブジェクトをcardObjectsに追加する
-            cardObjects.push({ img: card, count: 1 })
-          } else {
-            // 既存カードの場合、該当オブジェクトのcountを1増やす
-            const objectIndex = cardObjects.findIndex((obj) => {
-              return obj.img === card
-            })
-            cardObjects[objectIndex].count++
-          }
-        })
-
+        const cardObjects = this.toCardObjects(this.cards)
+        this.cards = this.toArrayCards(cardObjects)
         // 逆順にしたものを元の順に戻す
-        cardObjects.reverse()
-
-        // 種類順の配列をカードに変換
-        cardObjects.forEach((obj) => {
-          for (let i = 0; i < obj.count; ++i) {
-            sortedCards.push(obj.img)
-          }
-        })
-        this.cards = sortedCards
+        this.cards.reverse()
       } else if (newIndex < oldIndex) {
         // 前にカードを移動した場合
 
-        // カードの配列を頭から探索
-        this.cards.forEach((card) => {
-          // 種類順の配列(cardObjects)にあるカードかどうか、オブジェクトのimgキーを参照して確認する
-          const isCardInObjects = cardObjects.filter((obj) => {
-            return obj.img === card
-          })
-
-          if (isCardInObjects.length === 0) {
-            // 新しい種類のカードの場合、カードのオブジェクトをcardObjectsに追加する
-            cardObjects.push({ img: card, count: 1 })
-          } else {
-            // 既存カードの場合、該当オブジェクトのcountを1増やす
-            const objectIndex = cardObjects.findIndex((obj) => {
-              return obj.img === card
-            })
-            cardObjects[objectIndex].count++
-          }
-        })
-
-        // 種類順の配列をカードに変換
-        cardObjects.forEach((obj) => {
-          for (let i = 0; i < obj.count; ++i) {
-            sortedCards.push(obj.img)
-          }
-        })
-        this.cards = sortedCards
+        const cardObjects = this.toCardObjects(this.cards)
+        this.cards = this.toArrayCards(cardObjects)
       }
+    },
+    toCardObjects(cards) {
+      // 各カードがどの順で何枚入っているかを格納する配列
+      // obj{ img: String, count: Int}[]
+      const result = []
+
+      // カードの配列を頭から探索
+      cards.forEach((card) => {
+        // 種類順の配列(result)にあるカードかどうか、オブジェクトのimgキーを参照して確認する
+        const isCardInObjects = result.filter((obj) => obj.img === card)
+
+        // 種類順の配列に含まれているかどうか
+        if (isCardInObjects.length === 0) {
+          // 新規のカードの場合
+
+          // カードのオブジェクトをresultに新規追加する
+          result.push({ img: card, count: 1 })
+        } else {
+          // 既存のカードの場合
+
+          // 該当のオブジェクトのcountを1増やす
+          const objectIndex = result.findIndex((obj) => obj.img === card)
+          result[objectIndex].count++
+        }
+      })
+      return result
+    },
+    toArrayCards(objects) {
+      // 一覧で表示するカードの配列
+      const result = []
+
+      objects.forEach((obj) => {
+        for (let i = 0; i < obj.count; ++i) {
+          result.push(obj.img)
+        }
+      })
+      return result
     },
   },
 }
