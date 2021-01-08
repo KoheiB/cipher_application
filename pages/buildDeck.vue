@@ -69,11 +69,11 @@
             @end="drag = false"
             @change="onMoveCard"
           >
-            <CardPicked
+            <PickedCard
               v-for="(card, i) in cards"
               :key="i"
               :img="card"
-            ></CardPicked>
+            ></PickedCard>
           </draggable>
         </v-card>
       </v-col>
