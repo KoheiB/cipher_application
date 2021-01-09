@@ -1,23 +1,10 @@
-<!-- 
-変更点
-・Userのpasswordを消しました。
-・CardのcreatedAtとupdatedAtを消しました。
-・デッキをいいねする機能に関わるフィールドを修正しました。
-・いくつかフィールド名を微修正しました。
-　特に、下記の考え方で「お気に入り」や「いいね」といった似通ったものを区別しています。
-　　デッキ作成時にお気に入りカードを登録　→　mark
-　　ユーザ同士でいいねを登録　→　favorite
- -->
 - Users : Collection
     - DocumentId : random
         - userName : String
         - Decks : SubCollection
             - DocumentID : random
                 - deckName : String
-                <!-- 諸説
-                - inDeckCardIds : Array[string]
-                -->
-                - UseCards : SubCollection <!-- 動詞 + 名詞 のほうがよくないか？と思いUseに変えました -->
+                - UseCards : SubCollection
                   - DocumentId : Cards.DocumentId
                     - cardId : String
                     - title : String
@@ -26,7 +13,6 @@
                     - symbol2 : String
                     - count : Number
                     - displayOrder : Number
-
                 - heroCard : Map
                   - cardId : String
                   - title : String
@@ -39,10 +25,6 @@
                   - unitName : String
                   - symbol1 : String
                   - symbol2 : String 
-
-                <!-- 諸説
-                - markCardIds : Array[string]
-                -->
                 - MarkCards : SubCollection
                   - DocumentId : Cards.DocumentId
                     - cardId : String
@@ -52,7 +34,6 @@
                     - symbol2 : String
                     - count : Number
                     - displayOrder : Number
-
                 - isPublic : Boolean
                 - isPosted : Boolean
                 - comment : String
@@ -70,9 +51,34 @@
         - createdAt : Timestamp
         - updatedAt : Timestamp
 
-- Cards : Collectioon <!-- 一旦は検索条件に必要な最低限のカラムだけにする -->
+- Cards : Collectioon
+    <!-- スキルテキスト以外は楽にimportできたのでモデルにもフィールドを追加しておきました。 -->
     - DocumentId : cardId + rare (ex.B01-001SR+)
-        - title : String
-        - unitName : String
-        - symbol1 : String
-        - symbol2 : String
+      - card_no : String
+      - rare: String
+      - recording: String
+      - title: String
+      - unitName: String
+      - sortie_cost: String
+      - cc_cost: String
+      - symbol1: String
+      - symbol2: String
+      - gender:  String
+      - weapon: String
+      - type1: String
+      - type2: String
+      - type3: String
+      - type4: String
+      - n_skill_name1: String
+      - n_skill_name2: String
+      - n_skill_name3: String
+      - n_skill_name4: String
+      - s_skill_name1: String
+      - s_skill_name2: String
+      - c_power: String
+      - s_power: String
+      - range: String
+      - class: String
+      - job: String
+      - flavor: String
+      - illustrator: String        
