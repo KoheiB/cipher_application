@@ -59,8 +59,22 @@
             </div>
           </div>
         </div>
-        <v-card class="d-flex flex-wrap">
-          <Card v-for="n of 50" :key="n"></Card>
+        <v-card>
+          <draggable
+            v-model="cards"
+            class="d-flex flex-wrap"
+            group="cards"
+            :animation="200"
+            @start="drag = true"
+            @end="drag = false"
+            @change="onMoveCard"
+          >
+            <PickedCard
+              v-for="(card, i) in cards"
+              :key="i"
+              :img="card"
+            ></PickedCard>
+          </draggable>
         </v-card>
       </v-col>
     </v-row>
@@ -68,7 +82,11 @@
 </template>
 
 <script>
+import draggable from 'vuedraggable'
 export default {
+  components: {
+    draggable,
+  },
   data() {
     return {
       tab: null,
@@ -116,6 +134,28 @@ export default {
           color: 'brown',
         },
       ],
+      cards: [
+        require('@/static/img/S10/S10-001ST.png'),
+        require('@/static/img/S10/S10-001ST.png'),
+        require('@/static/img/S10/S10-001ST.png'),
+        require('@/static/img/S10/S10-001ST.png'),
+        require('@/static/img/S10/S10-002ST.png'),
+        require('@/static/img/S10/S10-002ST.png'),
+        require('@/static/img/S10/S10-002ST.png'),
+        require('@/static/img/S10/S10-002ST.png'),
+        require('@/static/img/S10/S10-003ST.png'),
+        require('@/static/img/S10/S10-003ST.png'),
+        require('@/static/img/S10/S10-003ST.png'),
+        require('@/static/img/S10/S10-003ST.png'),
+        require('@/static/img/S10/S10-004ST.png'),
+        require('@/static/img/S10/S10-004ST.png'),
+        require('@/static/img/S10/S10-004ST.png'),
+        require('@/static/img/S10/S10-004ST.png'),
+        require('@/static/img/S10/S10-005ST.png'),
+        require('@/static/img/S10/S10-005ST.png'),
+        require('@/static/img/S10/S10-005ST.png'),
+        require('@/static/img/S10/S10-005ST.png'),
+      ],
     }
   },
   methods: {
@@ -124,6 +164,67 @@ export default {
     },
     shareDeck() {
       console.log('shared')
+    },
+    // 1枚のカードをドラッグした際、同じ種類のカードの順序をまとめて入れ替えるためのメソッド
+    // 一旦、カードの配列を各カードの順序と枚数の情報に変換して並べなおす
+    onMoveCard(event) {
+      const newIndex = event.moved.newIndex
+      const oldIndex = event.moved.oldIndex
+
+      if (newIndex > oldIndex) {
+        // 後ろにカードを移動した場合
+
+        // 配列の順序をreverseして、末尾から探索できるようにしておく
+        // これにより、ドラッグして移動したカードが元より後ろの順で検知される
+        this.cards.reverse()
+
+        const cardObjects = this.toCardObjects(this.cards)
+        this.cards = this.toArrayCards(cardObjects)
+        // 逆順にしたものを元の順に戻す
+        this.cards.reverse()
+      } else if (newIndex < oldIndex) {
+        // 前にカードを移動した場合
+
+        const cardObjects = this.toCardObjects(this.cards)
+        this.cards = this.toArrayCards(cardObjects)
+      }
+    },
+    toCardObjects(cards) {
+      // 各カードがどの順で何枚入っているかを格納する配列
+      // obj{ img: String, count: Int}[]
+      const result = []
+
+      // カードの配列を頭から探索
+      cards.forEach((card) => {
+        // 種類順の配列(result)にあるカードかどうか、オブジェクトのimgキーを参照して確認する
+        const isCardInObjects = result.filter((obj) => obj.img === card)
+
+        // 種類順の配列に含まれているかどうか
+        if (isCardInObjects.length === 0) {
+          // 新規のカードの場合
+
+          // カードのオブジェクトをresultに新規追加する
+          result.push({ img: card, count: 1 })
+        } else {
+          // 既存のカードの場合
+
+          // 該当のオブジェクトのcountを1増やす
+          const objectIndex = result.findIndex((obj) => obj.img === card)
+          result[objectIndex].count++
+        }
+      })
+      return result
+    },
+    toArrayCards(objects) {
+      // 一覧で表示するカードの配列
+      const result = []
+
+      objects.forEach((obj) => {
+        for (let i = 0; i < obj.count; ++i) {
+          result.push(obj.img)
+        }
+      })
+      return result
     },
   },
 }
