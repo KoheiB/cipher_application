@@ -1,0 +1,84 @@
+- Users : Collection
+    - DocumentId : random
+        - userName : String
+        - Decks : SubCollection
+            - DocumentID : random
+                - deckName : String
+                - UseCards : SubCollection
+                  - DocumentId : Cards.DocumentId
+                    - cardId : String
+                    - title : String
+                    - unitName : String
+                    - symbol1 : String
+                    - symbol2 : String
+                    - count : Number
+                    - displayOrder : Number
+                - heroCard : Map
+                  - cardId : String
+                  - title : String
+                  - unitName : String
+                  - symbol1 : String
+                  - symbol2 : String
+                - mainClassChangeCard : Map
+                  - cardId : String
+                  - title : String
+                  - unitName : String
+                  - symbol1 : String
+                  - symbol2 : String 
+                - MarkCards : SubCollection
+                  - DocumentId : Cards.DocumentId
+                    - cardId : String
+                    - title : String
+                    - unitName : String
+                    - symbol1 : String
+                    - symbol2 : String
+                    - count : Number
+                    - displayOrder : Number
+                - isPublic : Boolean
+                - isPosted : Boolean
+                - comment : String
+                - favoritedCount : Number
+                - FavoritedUsers : SubCollection
+                  - DocumentId : random
+                    - favUserRef : String <!-- Userの情報は書き換え頻度が多いと判断し、DocumentReferenceを持つ方針にする -->
+                    - createdAt : Timestamp
+                - createdAt : Timestamp
+                - updatedAt : Timestamp
+        - FavoriteDecks : SubCollection
+          - DocumentId : random
+            - favDeckRef : String <!-- Deckの情報は書き換え頻度が多いと判断し、DocumentReferenceを持つ方針にする -->
+            - createdAt : Timestamp
+        - createdAt : Timestamp
+        - updatedAt : Timestamp
+
+- Cards : Collectioon
+    <!-- スキルテキスト以外は楽にimportできたのでモデルにもフィールドを追加しておきました。 -->
+    - DocumentId : cardId + rare (ex.B01-001SR+)
+      - card_no : String
+      - rare: String
+      - recording: String
+      - title: String
+      - unitName: String
+      - sortie_cost: String
+      - cc_cost: String
+      - symbol1: String
+      - symbol2: String
+      - gender:  String
+      - weapon: String
+      - type1: String
+      - type2: String
+      - type3: String
+      - type4: String
+      - n_skill_name1: String
+      - n_skill_name2: String
+      - n_skill_name3: String
+      - n_skill_name4: String
+      - s_skill_name1: String
+      - s_skill_name2: String
+      - c_power: String
+      - s_power: String
+      - range: String
+      - class: String
+      - job: String
+      - flavor: String
+      - illustrator: String        
