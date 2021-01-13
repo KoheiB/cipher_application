@@ -1,23 +1,43 @@
 <template>
-  <v-app-bar app>
+  <v-app-bar app dense>
     <v-toolbar-title>CipherApp</v-toolbar-title>
 
     <v-spacer></v-spacer>
 
-    <v-btn nuxt to="buildDeck" class="text-capitalize">Build Deck</v-btn>
-    <v-btn nuxt to="myDeckLists" class="text-capitalize">Deck Manager</v-btn>
-    <v-btn nuxt to="" class="text-capitalize">Recipe Board</v-btn>
-    <div v-show="isLogin" class="mx-5">
+    <v-toolbar-items class="hidden-mobile-and-down">
+      <v-btn-toggle v-model="icon" borderless>
+        <v-btn text nuxt to="buildDeck" class="text-capitalize">
+          <v-icon> mdi-file-edit-outline </v-icon>
+          <span class="hidden-ipad-and-down header-menu-text">
+            Build Deck
+          </span>
+        </v-btn>
+        <v-btn text nuxt to="myDeckLists" class="text-capitalize">
+          <v-icon> mdi-file-cog-outline </v-icon>
+          <span class="hidden-ipad-and-down header-menu-text">
+            Deck Manager
+          </span>
+        </v-btn>
+        <v-btn text nuxt to="" class="text-capitalize">
+          <v-icon> mdi-file-find-outline </v-icon>
+          <span class="hidden-ipad-and-down header-menu-text"
+            >Recipe Board
+          </span>
+        </v-btn>
+      </v-btn-toggle>
+    </v-toolbar-items>
+
+    <div v-show="isLogin" class="ml-5">
       <v-toolbar-items>
         <v-menu offset-y>
           <template v-slot:activator="{ on }">
-            <v-btn v-on="on" text style="text-transform: none">
+            <v-btn v-on="on" style="text-transform: none" text>
               <v-icon> mdi-account</v-icon>
               {{ user.name }}
             </v-btn>
           </template>
           <v-list>
-            <v-list-item v-for="user_menu in user_menus" :key="user_menu">
+            <v-list-item v-for="user_menu in user_menus" :key="user_menu" link>
               <v-list-item-content>
                 <v-list-item-title
                   @click="
@@ -36,8 +56,14 @@
       </v-toolbar-items>
     </div>
     <div v-show="!isLogin" class="mx-5">
-      <v-btn class="primary">新規登録</v-btn>
-      <v-btn class="info" @click="login">ログイン</v-btn>
+      <v-btn small class="primary">
+        <v-icon> mdi-account-plus</v-icon>
+        <span class="hidden-ipad-and-down">新規登録</span>
+      </v-btn>
+      <v-btn small class="info" @click="login">
+        <v-icon>mdi-login</v-icon>
+        <span class="hidden-ipad-and-down">ログイン</span>
+      </v-btn>
     </div>
   </v-app-bar>
 </template>
@@ -73,4 +99,8 @@ export default {
 }
 </script>
 
-<style></style>
+<style>
+.header-menu-text {
+  letter-spacing: -0.5px;
+}
+</style>

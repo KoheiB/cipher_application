@@ -38,7 +38,10 @@ export default {
 
   // Vuetify module configuration (https://go.nuxtjs.dev/config-vuetify)
   vuetify: {
-    customVariables: ['~/assets/variables.scss'],
+    // 開発環境でcustomVariablesを有効にするフラグ
+    // Doc: https://vuetifyjs.com/ja/customization/a-la-carte/
+    treeShake: true,
+    customVariables: ['~/assets/sass/variables.scss'],
     theme: {
       dark: false,
       themes: {
