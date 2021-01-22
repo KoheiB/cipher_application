@@ -34,12 +34,38 @@
         </v-form>
         <v-tabs-items v-model="tab">
           <v-tab-item>
-            <v-list>
-              <v-list-item v-for="card in cardList" :key="card._id">
+            <v-list height="400" class="overflow-y-auto">
+              <v-list-item
+                v-for="card in cardList"
+                :key="card._id"
+                @click="cards.push(card)"
+              >
+                <v-list-item-avatar>
+                  <v-img :src="card.avatar" />
+                </v-list-item-avatar>
                 <v-list-item-content>
+                  <v-list-item-subtitle
+                    v-text="card._id"
+                  ></v-list-item-subtitle>
+                  <v-list-item-subtitle
+                    v-text="card.title"
+                  ></v-list-item-subtitle>
                   <v-list-item-title v-text="card.unitName"></v-list-item-title>
                 </v-list-item-content>
+                <v-list-item-action>
+                  <v-btn>
+                    <v-icon>mdi-star</v-icon>
+                  </v-btn>
+                </v-list-item-action>
               </v-list-item>
+              <infinite-loading
+                ref="infiniteLoading"
+                spinner="spiral"
+                @infinite="infiniteHandler"
+              >
+                <span slot="no-more">No More Cards</span>
+                <span slot="no-results">No Data</span>
+              </infinite-loading>
             </v-list>
           </v-tab-item>
           <v-tab-item>
@@ -89,9 +115,11 @@
 
 <script>
 import draggable from 'vuedraggable'
+import InfiniteLoading from 'vue-infinite-loading'
 export default {
   components: {
     draggable,
+    InfiniteLoading,
   },
   data() {
     return {
@@ -253,7 +281,6 @@ export default {
           .get()
       }
       this.lastCard = this.nextPage.docs[this.nextPage.size - 1]
-      console.log(this.nextPage, this.lastCard)
     },
     displayCards() {
       const cardList = this.nextPage.docs.map((doc) => {
@@ -262,6 +289,14 @@ export default {
       cardList.forEach((card) => {
         this.cardList.push(card)
       })
+      return cardList
+    },
+    infiniteHandler($state) {
+      setTimeout(async () => {
+        await this.getCardsSnapshot()
+        this.displayCards()
+        this.displayCards.length <= 10 ? $state.loaded() : $state.complete()
+      }, 1000)
     },
   },
 }
