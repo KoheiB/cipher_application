@@ -34,7 +34,13 @@
         </v-form>
         <v-tabs-items v-model="tab">
           <v-tab-item>
-            <v-card>全てのカード</v-card>
+            <v-list>
+              <v-list-item v-for="card in cardList" :key="card._id">
+                <v-list-item-content>
+                  <v-list-item-title v-text="card.unitName"></v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
           </v-tab-item>
           <v-tab-item>
             <v-card>お気に入りカード</v-card>
@@ -91,6 +97,8 @@ export default {
     return {
       tab: null,
       deckName: '',
+      nextPage: null,
+      lastCard: null,
       selectedRadio: 0,
       radioItems: [
         {
@@ -156,7 +164,12 @@ export default {
         require('@/static/img/S10/S10-005ST.png'),
         require('@/static/img/S10/S10-005ST.png'),
       ],
+      cardList: [],
     }
+  },
+  async created() {
+    await this.getCardsSnapshot()
+    this.displayCards()
   },
   methods: {
     saveDeck() {
@@ -225,6 +238,30 @@ export default {
         }
       })
       return result
+    },
+    async getCardsSnapshot() {
+      if (this.lastCard) {
+        this.nextPage = await this.$firestore
+          .collection('Cards')
+          .startAfter(this.lastCard)
+          .limit(10)
+          .get()
+      } else {
+        this.nextPage = await this.$firestore
+          .collection('Cards')
+          .limit(10)
+          .get()
+      }
+      this.lastCard = this.nextPage.docs[this.nextPage.size - 1]
+      console.log(this.nextPage, this.lastCard)
+    },
+    displayCards() {
+      const cardList = this.nextPage.docs.map((doc) => {
+        return doc.data()
+      })
+      cardList.forEach((card) => {
+        this.cardList.push(card)
+      })
     },
   },
 }
