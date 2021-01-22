@@ -1,18 +1,16 @@
-/* eslint-disable prettier/prettier */
-import firebase from 'firebase'
+import firebase from 'firebase/app'
+import 'firebase/firestore'
+import 'firebase/auth'
+import 'firebase/storage'
+import config from './../firebaseConfig.json'
 
 if (!firebase.apps.length) {
-  firebase.initializeApp(
-    {
-      apiKey: "AIzaSyCJ8QjDNyiwsdMLOCyZsZOUR7rPfdAatFs",
-      authDomain: "cipher-app-4a381.firebaseapp.com",
-      projectId: "cipher-app-4a381",
-      storageBucket: "cipher-app-4a381.appspot.com",
-      messagingSenderId: "304342188149",
-      appId: "1:304342188149:web:58330ba75b30ae8559783c",
-      measurementId: "G-KRNKBB1Y4K"
-    }
-  )
+  firebase.initializeApp({ ...config })
 }
 
-export default firebase
+export default ({ app }, inject) => {
+  inject('firebase', firebase)
+  inject('firestore', firebase.firestore())
+  inject('fireAuth', firebase.auth())
+  inject('fireStorage', firebase.storage())
+}
