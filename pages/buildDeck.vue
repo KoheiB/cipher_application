@@ -7,31 +7,16 @@
           <v-tab><v-icon>mdi-bookmark-multiple</v-icon></v-tab>
         </v-tabs>
         <v-container>
-          <v-radio-group v-model="selectedRadio" mandatory row>
-            <div class="d-flex flex-wrap flex-row">
-              <v-flex
-                v-for="radioItem in radioItems"
-                :key="radioItem.color"
-                md3
-              >
-                <v-radio
-                  class="v-radio-wrapper"
-                  :name="radioItem.name"
-                  :label="radioItem.name"
-                  :color="radioItem.color"
-                ></v-radio>
-              </v-flex>
-            </div>
-          </v-radio-group>
+          <v-select
+            v-model="selectedSymbol"
+            :items="selectItems"
+            :item-color="selectItems.color"
+            label="シンボルで絞り込む"
+            prepend-inner-icon="mdi-magnify"
+            item-text="symbol"
+            @change="filterSymbol(selectedSymbol)"
+          ></v-select>
         </v-container>
-        <!-- <v-form>
-        <v-text-field
-          class="mt-2"
-          solo
-          append-icon="mdi-magnify"
-          placeholder="ユニット名で検索"
-        ></v-text-field>
-      </v-form> -->
         <v-autocomplete
           v-model="unitNameFilter"
           :items="unitNames"
@@ -39,16 +24,18 @@
           prepend-inner-icon="mdi-database-search"
           clearable
           outlined
-          @input="filterCardList(unitNameFilter)"
+          @input="filterUnitName(unitNameFilter)"
         >
         </v-autocomplete>
         <v-tabs-items v-model="tab">
           <v-tab-item>
-            <v-list height="400" class="overflow-y-auto">
+            <v-list height="400" class="overflow-y-auto" outlined>
               <v-list-item
                 v-for="card in cardList"
                 :key="card._id"
-                @click="cards.push(card)"
+                :class="card.color"
+                three-line
+                @click.prevent="cards.push(card)"
               >
                 <v-list-item-avatar>
                   <v-img :src="card.avatar" />
@@ -63,7 +50,7 @@
                   <v-list-item-title v-text="card.unitName"></v-list-item-title>
                 </v-list-item-content>
                 <v-list-item-action>
-                  <v-btn>
+                  <v-btn outlined>
                     <v-icon @click.prevent="markCards.push(card)"
                       >mdi-star</v-icon
                     >
@@ -100,14 +87,6 @@
                   <v-list-item-title v-text="card.unitName"></v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
-              <!-- <infinite-loading
-              ref="infiniteLoading"
-              spinner="spiral"
-              @infinite="infiniteHandler"
-            >
-              <span slot="no-more">No More Cards</span>
-              <span slot="no-results">No Data</span>
-            </infinite-loading> -->
             </v-list>
           </v-tab-item>
         </v-tabs-items>
@@ -162,48 +141,58 @@ export default {
       searchDrawer: null,
       nextPage: null,
       lastCard: null,
-      selectedRadio: 0,
+      selectedSymbol: '指定なし',
       unitNameFilter: '',
       unitNames: ['マルス', 'シーダ', 'ジェイガン'],
-      radioItems: [
+      selectItems: [
         {
           name: '全',
+          symbol: '指定なし',
           color: 'grey lighten-1',
         },
         {
           name: '無',
+          symbol: '（なし）',
           color: 'grey',
         },
         {
           name: '赤',
+          symbol: '光の剣',
           color: 'red',
         },
         {
           name: '青',
+          symbol: '聖痕',
           color: 'blue',
         },
         {
           name: '白',
+          symbol: '白夜',
           color: 'grey lighten-2',
         },
         {
           name: '黒',
+          symbol: '暗夜',
           color: 'black',
         },
         {
           name: '緑',
+          symbol: 'メダリオン',
           color: 'green',
         },
         {
           name: '紫',
+          symbol: '神器',
           color: 'purple',
         },
         {
           name: '黄',
+          symbol: '聖戦旗',
           color: 'orange',
         },
         {
           name: '茶',
+          symbol: '女神紋',
           color: 'brown',
         },
       ],
@@ -301,7 +290,34 @@ export default {
     },
     displayCards() {
       const cardData = this.nextPage.docs.map((doc) => {
-        return doc.data()
+        const result = doc.data()
+        switch (result.symbol2) {
+          case '聖なる':
+            result.color = 'skyblue'
+            break
+          case '暗夜':
+            result.color = 'pink'
+            break
+          default:
+            switch (result.symbol1) {
+              case '光の剣':
+                result.color = 'red'
+                break
+              case '聖痕':
+                result.color = 'blue'
+                break
+              case '白夜':
+                result.color = 'white'
+                break
+              case '暗夜':
+                result.color = 'grey'
+                break
+              case 'メダリオン':
+                result.color = 'green'
+                break
+            }
+        }
+        return result
       })
       cardData.forEach((card) => {
         card.image = require('~/static/img/B01/B01-001SR.png')
@@ -316,17 +332,16 @@ export default {
         this.displayCards.length <= 10 ? $state.loaded() : $state.complete()
       }, 1000)
     },
-    filterCardList(unitNameFilter) {
+    filterUnitName(unitNameFilter) {
       this.cards.filter((card) => {
         return card.unitName === unitNameFilter
+      })
+    },
+    filterSymbol(symbol) {
+      this.cardList.filter((card) => {
+        return card.symbol1 === symbol
       })
     },
   },
 }
 </script>
-
-<style>
-.v-radio-wrapper {
-  margin-bottom: 10px;
-}
-</style>
