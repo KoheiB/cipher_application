@@ -12,10 +12,10 @@
             :items="selectItems"
             :item-color="selectItems.color"
             label="シンボルで絞り込む"
-            prepend-inner-icon="mdi-magnify"
+            prepend-inner-icon="mdi-filter"
             item-text="symbol"
             item-value="symbol"
-            @change="filterSymbol(selectedSymbol)"
+            @change="getSymbolFilterCardsSnapshot(selectedSymbol)"
           ></v-select>
         </v-container>
         <v-autocomplete
@@ -210,7 +210,7 @@ export default {
     }
   },
   async created() {
-    await this.getCardsSnapshot()
+    await this.getAllCardsSnapshot()
     this.displayCards()
   },
   methods: {
@@ -281,7 +281,7 @@ export default {
       })
       return result
     },
-    async getCardsSnapshot() {
+    async getAllCardsSnapshot() {
       if (this.lastCard) {
         this.nextPage = await this.$firestore
           .collection('Cards')
@@ -309,7 +309,7 @@ export default {
           default:
             switch (result.symbol1) {
               case '光の剣':
-                result.color = 'red accent-1'
+                result.color = 'red lighten-3'
                 break
               case '聖痕':
                 result.color = 'blue accent-1'
@@ -330,7 +330,7 @@ export default {
                 result.color = 'amber lighten-4'
                 break
               case '女神紋':
-                result.color = 'brown lighten-1'
+                result.color = 'brown lighten-3'
                 break
             }
         }
@@ -345,7 +345,7 @@ export default {
     infiniteHandler($state) {
       console.log('inifinite')
       setTimeout(async () => {
-        await this.getCardsSnapshot()
+        await this.getAllCardsSnapshot()
         this.displayCards()
         this.displayCards.length <= 10 ? $state.loaded() : $state.complete()
       }, 1000)
@@ -353,7 +353,16 @@ export default {
     filterUnitName(unitName) {
       this.cardList.filter((card) => card.unitName === unitName)
     },
-    async filterSymbol(symbol) {},
+    async getSymbolFilterCardsSnapshot(symbol) {
+      this.nextPage = await this.$firestore
+        .collection('Cards')
+        .where('symbol1', '==', symbol)
+        .limit(10)
+        .get()
+      this.lastCard = this.nextPage.docs[this.nextPage.size - 1]
+      this.cardList = []
+      this.displayCards()
+    },
   },
 }
 </script>
