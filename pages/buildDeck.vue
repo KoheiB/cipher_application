@@ -1,87 +1,106 @@
 <template>
   <v-container>
-    <v-navigation-drawer app clipped width="400" v-model="searchDrawer">
-      <v-tabs v-model="tab" grow>
-        <v-tab>ALL</v-tab>
-        <v-tab><v-icon>mdi-bookmark-multiple</v-icon></v-tab>
-      </v-tabs>
+    <v-navigation-drawer v-model="searchDrawer" app clipped width="400">
       <v-container>
-        <v-radio-group v-model="selectedRadio" mandatory row>
-          <div class="d-flex flex-wrap flex-row">
-            <v-flex v-for="radioItem in radioItems" :key="radioItem.color" md3>
-              <v-radio
-                class="v-radio-wrapper"
-                :name="radioItem.name"
-                :label="radioItem.name"
-                :color="radioItem.color"
-              ></v-radio>
-            </v-flex>
-          </div>
-        </v-radio-group>
-      </v-container>
-      <v-form>
+        <v-tabs v-model="tab" grow>
+          <v-tab>ALL</v-tab>
+          <v-tab><v-icon>mdi-bookmark-multiple</v-icon></v-tab>
+        </v-tabs>
+        <v-container>
+          <v-radio-group v-model="selectedRadio" mandatory row>
+            <div class="d-flex flex-wrap flex-row">
+              <v-flex
+                v-for="radioItem in radioItems"
+                :key="radioItem.color"
+                md3
+              >
+                <v-radio
+                  class="v-radio-wrapper"
+                  :name="radioItem.name"
+                  :label="radioItem.name"
+                  :color="radioItem.color"
+                ></v-radio>
+              </v-flex>
+            </div>
+          </v-radio-group>
+        </v-container>
+        <!-- <v-form>
         <v-text-field
           class="mt-2"
           solo
           append-icon="mdi-magnify"
           placeholder="ユニット名で検索"
         ></v-text-field>
-      </v-form>
-      <v-tabs-items v-model="tab">
-        <v-tab-item>
-          <v-list height="400" class="overflow-y-auto">
-            <v-list-item
-              v-for="card in cardList"
-              :key="card._id"
-              @click="cards.push(card)"
-            >
-              <v-list-item-avatar>
-                <v-img :src="card.avatar" />
-              </v-list-item-avatar>
-              <v-list-item-content>
-                <v-list-item-subtitle v-text="card._id"></v-list-item-subtitle>
-                <v-list-item-subtitle
-                  v-text="card.title"
-                ></v-list-item-subtitle>
-                <v-list-item-title v-text="card.unitName"></v-list-item-title>
-              </v-list-item-content>
-              <v-list-item-action>
-                <v-btn>
-                  <v-icon @click.prevent="markCards.push(card)"
-                    >mdi-star</v-icon
-                  >
-                </v-btn>
-              </v-list-item-action>
-            </v-list-item>
-            <infinite-loading
-              ref="infiniteLoading"
-              spinner="spiral"
-              @infinite="infiniteHandler"
-            >
-              <span slot="no-more">No More Cards</span>
-              <span slot="no-results">No Data</span>
-            </infinite-loading>
-          </v-list>
-        </v-tab-item>
-        <v-tab-item>
-          <v-list height="400" class="overflow-y-auto">
-            <v-list-item
-              v-for="card in markCards"
-              :key="card._id"
-              @click="cards.push(card)"
-            >
-              <v-list-item-avatar>
-                <v-img :src="card.avatar" />
-              </v-list-item-avatar>
-              <v-list-item-content>
-                <v-list-item-subtitle v-text="card._id"></v-list-item-subtitle>
-                <v-list-item-subtitle
-                  v-text="card.title"
-                ></v-list-item-subtitle>
-                <v-list-item-title v-text="card.unitName"></v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-            <!-- <infinite-loading
+      </v-form> -->
+        <v-autocomplete
+          v-model="unitNameFilter"
+          :items="unitNames"
+          label="ユニット名で検索"
+          prepend-inner-icon="mdi-database-search"
+          clearable
+          outlined
+          @input="filterCardList(unitNameFilter)"
+        >
+        </v-autocomplete>
+        <v-tabs-items v-model="tab">
+          <v-tab-item>
+            <v-list height="400" class="overflow-y-auto">
+              <v-list-item
+                v-for="card in cardList"
+                :key="card._id"
+                @click="cards.push(card)"
+              >
+                <v-list-item-avatar>
+                  <v-img :src="card.avatar" />
+                </v-list-item-avatar>
+                <v-list-item-content>
+                  <v-list-item-subtitle
+                    v-text="card._id"
+                  ></v-list-item-subtitle>
+                  <v-list-item-subtitle
+                    v-text="card.title"
+                  ></v-list-item-subtitle>
+                  <v-list-item-title v-text="card.unitName"></v-list-item-title>
+                </v-list-item-content>
+                <v-list-item-action>
+                  <v-btn>
+                    <v-icon @click.prevent="markCards.push(card)"
+                      >mdi-star</v-icon
+                    >
+                  </v-btn>
+                </v-list-item-action>
+              </v-list-item>
+              <infinite-loading
+                ref="infiniteLoading"
+                spinner="spiral"
+                @infinite="infiniteHandler"
+              >
+                <span slot="no-more">No More Cards</span>
+                <span slot="no-results">No Data</span>
+              </infinite-loading>
+            </v-list>
+          </v-tab-item>
+          <v-tab-item>
+            <v-list height="400" class="overflow-y-auto">
+              <v-list-item
+                v-for="card in markCards"
+                :key="card._id"
+                @click="cards.push(card)"
+              >
+                <v-list-item-avatar>
+                  <v-img :src="card.avatar" />
+                </v-list-item-avatar>
+                <v-list-item-content>
+                  <v-list-item-subtitle
+                    v-text="card._id"
+                  ></v-list-item-subtitle>
+                  <v-list-item-subtitle
+                    v-text="card.title"
+                  ></v-list-item-subtitle>
+                  <v-list-item-title v-text="card.unitName"></v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <!-- <infinite-loading
               ref="infiniteLoading"
               spinner="spiral"
               @infinite="infiniteHandler"
@@ -89,9 +108,10 @@
               <span slot="no-more">No More Cards</span>
               <span slot="no-results">No Data</span>
             </infinite-loading> -->
-          </v-list>
-        </v-tab-item>
-      </v-tabs-items>
+            </v-list>
+          </v-tab-item>
+        </v-tabs-items>
+      </v-container>
     </v-navigation-drawer>
 
     <div class="d-flex justify-space-between">
@@ -143,6 +163,8 @@ export default {
       nextPage: null,
       lastCard: null,
       selectedRadio: 0,
+      unitNameFilter: '',
+      unitNames: ['マルス', 'シーダ', 'ジェイガン'],
       radioItems: [
         {
           name: '全',
@@ -293,6 +315,11 @@ export default {
         this.displayCards()
         this.displayCards.length <= 10 ? $state.loaded() : $state.complete()
       }, 1000)
+    },
+    filterCardList(unitNameFilter) {
+      this.cards.filter((card) => {
+        return card.unitName === unitNameFilter
+      })
     },
   },
 }
