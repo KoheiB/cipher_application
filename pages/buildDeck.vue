@@ -14,6 +14,7 @@
             label="シンボルで絞り込む"
             prepend-inner-icon="mdi-magnify"
             item-text="symbol"
+            item-value="symbol"
             @change="filterSymbol(selectedSymbol)"
           ></v-select>
         </v-container>
@@ -30,33 +31,40 @@
         <v-tabs-items v-model="tab">
           <v-tab-item>
             <v-list height="400" class="overflow-y-auto" outlined>
-              <v-list-item
-                v-for="card in cardList"
-                :key="card._id"
-                :class="card.color"
-                three-line
-                @click.prevent="cards.push(card)"
-              >
-                <v-list-item-avatar>
-                  <v-img :src="card.avatar" />
-                </v-list-item-avatar>
-                <v-list-item-content>
-                  <v-list-item-subtitle
-                    v-text="card._id"
-                  ></v-list-item-subtitle>
-                  <v-list-item-subtitle
-                    v-text="card.title"
-                  ></v-list-item-subtitle>
-                  <v-list-item-title v-text="card.unitName"></v-list-item-title>
-                </v-list-item-content>
-                <v-list-item-action>
-                  <v-btn outlined>
-                    <v-icon @click.prevent="markCards.push(card)"
-                      >mdi-star</v-icon
-                    >
-                  </v-btn>
-                </v-list-item-action>
-              </v-list-item>
+              <template v-for="(card, index) in cardList">
+                <v-list-item
+                  :key="card._id"
+                  :class="card.color"
+                  three-line
+                  @click.prevent="cards.push(card)"
+                >
+                  <v-list-item-avatar>
+                    <v-img :src="card.avatar" />
+                  </v-list-item-avatar>
+                  <v-list-item-content>
+                    <v-list-item-subtitle
+                      v-text="card._id"
+                    ></v-list-item-subtitle>
+                    <v-list-item-subtitle
+                      v-text="card.title"
+                    ></v-list-item-subtitle>
+                    <v-list-item-title
+                      v-text="card.unitName"
+                    ></v-list-item-title>
+                  </v-list-item-content>
+                  <v-list-item-action>
+                    <v-btn outlined>
+                      <v-icon @click.prevent="markCards.push(card)"
+                        >mdi-star</v-icon
+                      >
+                    </v-btn>
+                  </v-list-item-action>
+                </v-list-item>
+                <v-divider
+                  v-if="index < cardList.length - 1"
+                  :key="index"
+                ></v-divider>
+              </template>
               <infinite-loading
                 ref="infiniteLoading"
                 spinner="spiral"
@@ -292,7 +300,7 @@ export default {
       const cardData = this.nextPage.docs.map((doc) => {
         const result = doc.data()
         switch (result.symbol2) {
-          case '聖なる':
+          case '聖痕':
             result.color = 'skyblue'
             break
           case '暗夜':
@@ -301,19 +309,28 @@ export default {
           default:
             switch (result.symbol1) {
               case '光の剣':
-                result.color = 'red'
+                result.color = 'red accent-1'
                 break
               case '聖痕':
-                result.color = 'blue'
+                result.color = 'blue accent-1'
                 break
               case '白夜':
-                result.color = 'white'
+                result.color = 'grey lighten-4'
                 break
               case '暗夜':
-                result.color = 'grey'
+                result.color = 'grey lighten-1'
                 break
               case 'メダリオン':
-                result.color = 'green'
+                result.color = 'green lighten-3'
+                break
+              case '神器':
+                result.color = 'deep-purple lighten-3'
+                break
+              case '聖戦旗':
+                result.color = 'amber lighten-4'
+                break
+              case '女神紋':
+                result.color = 'brown lighten-1'
                 break
             }
         }
@@ -326,22 +343,17 @@ export default {
       return cardData
     },
     infiniteHandler($state) {
+      console.log('inifinite')
       setTimeout(async () => {
         await this.getCardsSnapshot()
         this.displayCards()
         this.displayCards.length <= 10 ? $state.loaded() : $state.complete()
       }, 1000)
     },
-    filterUnitName(unitNameFilter) {
-      this.cards.filter((card) => {
-        return card.unitName === unitNameFilter
-      })
+    filterUnitName(unitName) {
+      this.cardList.filter((card) => card.unitName === unitName)
     },
-    filterSymbol(symbol) {
-      this.cardList.filter((card) => {
-        return card.symbol1 === symbol
-      })
-    },
+    async filterSymbol(symbol) {},
   },
 }
 </script>
