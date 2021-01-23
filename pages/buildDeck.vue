@@ -9,12 +9,13 @@
       mobile-breakpoint="500"
     >
       <!--▼ ユニット名フィルター ****************************************▼-->
-      <v-container class="pb-0">
+      <v-container class="pb-0 mt-4">
         <v-autocomplete
           v-model="unitNameFilter"
           :items="unitNameFilterItems"
-          label="ユニット名で絞り込み"
+          label="ユニット名で検索"
           prepend-inner-icon="mdi-database-search"
+          dense
           clearable
           outlined
           @change="changeFilter()"
@@ -30,6 +31,7 @@
           :items="symbolFilterItems"
           label="シンボルで絞り込み"
           prepend-inner-icon="mdi-filter"
+          dense
           clearable
           outlined
           @change="changeFilter()"
@@ -39,18 +41,22 @@
 
       <!--▼ タブ選択画面 ****************************************▼-->
       <v-tabs v-model="tab" grow>
-        <v-tab><v-icon>mdi-cards</v-icon>All Cards</v-tab>
-        <v-tab><v-icon>mdi-bookmark-multiple</v-icon>Bookmark</v-tab>
+        <v-tab style="max-width: 50%"
+          ><v-icon class="pr-1">mdi-cards</v-icon>Search</v-tab
+        >
+        <v-tab style="max-width: 50%"
+          ><v-icon class="pr-1">mdi-bookmark-multiple</v-icon>Bookmark</v-tab
+        >
       </v-tabs>
       <!--▲ タブ選択画面 ****************************************▲-->
 
       <v-tabs-items v-model="tab">
-        <!--▼ タブ内容1:All Cards ****************************************▼-->
+        <!--▼ タブ内容1:Search ****************************************▼-->
         <v-tab-item>
           <v-list class="py-0 overflow-y-auto" height="450" outlined>
             <template v-for="(card, index) in filteredCards">
               <v-list-item
-                :key="'all' + card._id"
+                :key="'search-' + card._id"
                 :class="card.color"
                 class="pl-0"
                 three-line
@@ -94,14 +100,14 @@
             </infinite-loading>
           </v-list>
         </v-tab-item>
-        <!--▲ タブ内容1:All Cards ****************************************▲-->
+        <!--▲ タブ内容1:Search ****************************************▲-->
 
         <!--▼ タブ内容2:Bookmark ****************************************▼-->
         <v-tab-item>
           <v-list height="400" class="overflow-y-auto">
             <v-list-item
               v-for="card in markCards"
-              :key="'mark' + card._id"
+              :key="'mark-' + card._id"
               @click="myDeckCards.push(card)"
             >
               <v-list-item-avatar>
@@ -186,6 +192,9 @@ export default {
         'クロム',
         'アルフォンス',
         'リョウマ',
+        'シグレ',
+        'リン',
+        'チキ',
         'ポー',
       ],
       // シンボルフィルター
@@ -274,14 +283,15 @@ export default {
       await this.setLastFilteredCard()
       await this.displayCards()
     },
+    // フィルターをリセット
     resetFilter() {
       this.filteredCards = []
       this.nextFilteredCards = null
       this.lastFilteredCard = null
     },
+    // フィルターによって異なるスナップショットを取得
     async getFilteredCardsSnapshot() {
       switch (this.unitNameFilter) {
-        // ユニット名でフィルターされていない時
         case undefined:
           switch (this.symbolFilter) {
             // ユニット名:false、シンボル:false
@@ -293,7 +303,6 @@ export default {
               await this.getSymbolFilteredCardsSnapshot()
           }
           break
-        // ユニット名でフィルターされている時
         default:
           switch (this.symbolFilter) {
             // ユニット名:true、シンボル:false
@@ -306,25 +315,7 @@ export default {
           }
       }
     },
-    setLastFilteredCard() {
-      this.lastFilteredCard = this.nextFilteredCards.docs[
-        this.nextFilteredCards.size - 1
-      ]
-    },
-    displayCards() {
-      const result = this.nextFilteredCards.docs.map((doc) => {
-        const docData = doc.data()
-        this.addSymbolColorData(docData.symbols, docData)
-        return docData
-      })
-      result.forEach((card) => {
-        const newId = card._id.replace('+', 'plus')
-        const imageUrl = '/img/' + card.recording + '/' + newId + '.png'
-        card.image = imageUrl
-        this.filteredCards.push(card)
-      })
-      return result
-    },
+    // スナップショットを取得するメソッド郡
     async getNoFilteredCardsSnapshot() {
       if (this.lastFilteredCard) {
         this.nextFilteredCards = await this.$firestore
@@ -338,7 +329,6 @@ export default {
           .limit(10)
           .get()
       }
-      this.setLastFilteredCard()
     },
     async getUnitNameFilteredCardsSnapshot() {
       if (this.lastFilteredCard) {
@@ -355,7 +345,6 @@ export default {
           .limit(10)
           .get()
       }
-      this.setLastFilteredCard()
     },
     async getSymbolFilteredCardsSnapshot() {
       if (this.lastFilteredCard) {
@@ -372,7 +361,6 @@ export default {
           .limit(10)
           .get()
       }
-      this.setLastFilteredCard()
     },
     async getUnitNameAndSymbolFilteredCardsSnapshot() {
       if (this.lastFilteredCard) {
@@ -391,24 +379,33 @@ export default {
           .limit(10)
           .get()
       }
-      this.setLastFilteredCard()
     },
-    infiniteHandler($state) {
-      setTimeout(async () => {
-        await this.getFilteredCardsSnapshot()
-        // 取得したカードが10未満ならスクロール終了
-        if (this.nextFilteredCards.size < 10) {
-          $state.complete()
-        } else {
-          this.displayCards()
-          $state.loaded()
-        }
-      }, 100)
+    // 無限スクロールのために、最後のカードを取得しておく
+    setLastFilteredCard() {
+      this.lastFilteredCard = this.nextFilteredCards.docs[
+        this.nextFilteredCards.size - 1
+      ]
     },
+    // 取得したスナップショットのデータをクライアントサイドジョインののちに表示
+    displayCards() {
+      const result = this.nextFilteredCards.docs.map((doc) => {
+        const docData = doc.data()
+        this.addSymbolColorData(docData.symbols, docData)
+        return docData
+      })
+      result.forEach((card) => {
+        const newId = card._id.replace('+', 'plus')
+        const imageUrl = '/img/' + card.recording + '/' + newId + '.png'
+        card.image = imageUrl
+        this.filteredCards.push(card)
+      })
+      return result
+    },
+    // シンボルにより背景色をカードのデータに追加するメソッド
     addSymbolColorData(symbols, data) {
       switch (symbols[1]) {
         case '聖痕':
-          data.color = 'skyblue'
+          data.color = 'black'
           break
         case '暗夜':
           data.color = 'pink'
@@ -444,6 +441,23 @@ export default {
               break
           }
       }
+    },
+    // 無限スクロール
+    infiniteHandler($state) {
+      setTimeout(async () => {
+        await this.getFilteredCardsSnapshot()
+        await this.setLastFilteredCard()
+        await this.displayCards()
+        // 取得したカードが10未満ならスクロール終了
+        if (this.nextFilteredCards.size <= 9) {
+          await this.getFilteredCardsSnapshot()
+          await this.setLastFilteredCard()
+          await this.displayCards()
+          $state.complete()
+        } else {
+          $state.loaded()
+        }
+      }, 100)
     },
   },
 }
