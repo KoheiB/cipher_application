@@ -37,7 +37,7 @@
         </v-autocomplete>
         <v-tabs-items v-model="tab">
           <v-tab-item>
-            <v-list height="400" class="overflow-y-auto" outlined>
+            <v-list class="py-0 overflow-y-auto" height="450" outlined>
               <template v-for="(card, index) in cardList">
                 <v-list-item
                   :key="'all' + card._id"
@@ -169,7 +169,7 @@ export default {
       selectItems: [
         {
           name: '無',
-          symbol: '（なし）',
+          symbol: 'なし',
           color: 'grey',
         },
         {
@@ -317,7 +317,7 @@ export default {
             break
           default:
             switch (result.symbols[0]) {
-              case '':
+              case 'なし':
                 result.color = 'cyan lighten-5'
                 break
               case '光の剣':
@@ -381,22 +381,15 @@ export default {
     },
     async getSymbolFilterCardsSnapshot(symbol) {
       if (!symbol) {
-        this.getAllCardsSnapshot()
-        this.displayCards()
-        return
-      }
-      if (symbol === '（なし）') {
-        symbol = ''
-        this.nextPage = await this.$firestore
-          .collection('Cards')
-          .where('symbols', 'array-contains', symbol)
-          .limit(10)
-          .get()
-        this.lastCard = this.nextPage.docs[this.nextPage.size - 1]
+        console.log('clear filter')
         this.cardList = []
+        this.lastCard = null
+        this.nextPage = null
+        await this.getAllCardsSnapshot()
         this.displayCards()
         return
       }
+      console.log(symbol)
       this.nextPage = await this.$firestore
         .collection('Cards')
         .where('symbols', 'array-contains', symbol)
