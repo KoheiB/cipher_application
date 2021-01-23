@@ -219,6 +219,7 @@ export default {
     shareDeck() {
       console.log('shared')
     },
+    // ▼ マイデッキビューに関するメソッド ****************************************▼
     // 1枚のカードをドラッグした際、同じ種類のカードの順序をまとめて入れ替えるためのメソッド
     // 一旦、カードの配列を各カードの順序と枚数の情報に変換して並べなおす
     onMoveCard(event) {
@@ -276,12 +277,16 @@ export default {
       })
       return result
     },
+    // ▲ マイデッキビューに関するメソッド ****************************************▲
+
+    // ▼ 検索ドロワーに関するメソッド ****************************************▼
     // フィルターを変更した時の処理
     async changeFilter() {
       await this.resetFilter()
       await this.getFilteredCardsSnapshot()
       await this.setLastFilteredCard()
       await this.displayCards()
+      await this.$refs.infiniteLoading.stateChanger.reset()
     },
     // フィルターをリセット
     resetFilter() {
@@ -289,7 +294,7 @@ export default {
       this.nextFilteredCards = null
       this.lastFilteredCard = null
     },
-    // フィルターによって異なるスナップショットを取得
+    // フィルターのパターンによって異なるスナップショットを取得
     async getFilteredCardsSnapshot() {
       switch (this.unitNameFilter) {
         case undefined:
@@ -315,7 +320,7 @@ export default {
           }
       }
     },
-    // スナップショットを取得するメソッド郡
+    // スナップショットを取得するメソッド4パターン
     async getNoFilteredCardsSnapshot() {
       if (this.lastFilteredCard) {
         this.nextFilteredCards = await this.$firestore
@@ -380,13 +385,13 @@ export default {
           .get()
       }
     },
-    // 無限スクロールのために、最後のカードを取得しておく
+    // 無限スクロールのために、最後に表示されているカードのスナップショットを取得しておく
     setLastFilteredCard() {
       this.lastFilteredCard = this.nextFilteredCards.docs[
         this.nextFilteredCards.size - 1
       ]
     },
-    // 取得したスナップショットのデータをクライアントサイドジョインののちに表示
+    // 取得した次に表示するカードのスナップショットのデータをクライアントサイドジョインののちに表示
     displayCards() {
       const result = this.nextFilteredCards.docs.map((doc) => {
         const docData = doc.data()
@@ -450,15 +455,13 @@ export default {
         await this.displayCards()
         // 取得したカードが10未満ならスクロール終了
         if (this.nextFilteredCards.size <= 9) {
-          await this.getFilteredCardsSnapshot()
-          await this.setLastFilteredCard()
-          await this.displayCards()
           $state.complete()
         } else {
           $state.loaded()
         }
       }, 100)
     },
+    // ▲ 検索ドロワーに関するメソッド ****************************************▲
   },
 }
 </script>
