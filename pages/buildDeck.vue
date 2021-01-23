@@ -405,10 +405,10 @@ export default {
     addSymbolColorData(symbols, data) {
       switch (symbols[1]) {
         case '聖痕':
-          data.color = 'black'
+          data.color = 'redblue'
           break
         case '暗夜':
-          data.color = 'pink'
+          data.color = 'whiteblack'
           break
         default:
           switch (symbols[0]) {
@@ -462,3 +462,22 @@ export default {
   },
 }
 </script>
+
+<style>
+.redblue {
+  background: rgb(239, 154, 154);
+  background: linear-gradient(
+    90deg,
+    rgba(239, 154, 154, 1) 50%,
+    rgba(187, 222, 251, 1) 70%
+  );
+}
+.whiteblack {
+  background: rgb(245, 245, 245);
+  background: linear-gradient(
+    90deg,
+    rgba(189, 189, 189, 1) 50%,
+    rgba(245, 245, 245, 1) 70%
+  );
+}
+</style>
