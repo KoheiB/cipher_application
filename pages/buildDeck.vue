@@ -179,7 +179,7 @@ export default {
       nextFilteredCards: null,
       lastFilteredCard: null,
       // ユニット名フィルター
-      unitNameFilter: '',
+      unitNameFilter: undefined,
       unitNameFilterItems: [
         'マルス',
         'シーダ',
@@ -189,7 +189,7 @@ export default {
         'ポー',
       ],
       // シンボルフィルター
-      symbolFilter: '',
+      symbolFilter: undefined,
       symbolFilterItems: [
         'なし',
         '光の剣',
@@ -267,14 +267,63 @@ export default {
       })
       return result
     },
-    changeFilter() {
-      this.getFilteredCardsSnapshot()
-      this.displayCards()
+    // フィルターを変更した時の処理
+    async changeFilter() {
+      await this.resetFilter()
+      await this.getFilteredCardsSnapshot()
+      await this.setLastFilteredCard()
+      await this.displayCards()
+    },
+    resetFilter() {
+      this.filteredCards = []
+      this.nextFilteredCards = null
+      this.lastFilteredCard = null
+    },
+    async getFilteredCardsSnapshot() {
+      switch (this.unitNameFilter) {
+        // ユニット名でフィルターされていない時
+        case undefined:
+          switch (this.symbolFilter) {
+            // ユニット名:false、シンボル:false
+            case undefined:
+              await this.getNoFilteredCardsSnapshot()
+              break
+            // ユニット名:false、シンボル:true
+            default:
+              await this.getSymbolFilteredCardsSnapshot()
+          }
+          break
+        // ユニット名でフィルターされている時
+        default:
+          switch (this.symbolFilter) {
+            // ユニット名:true、シンボル:false
+            case undefined:
+              await this.getUnitNameFilteredCardsSnapshot()
+              break
+            // ユニット名:true、シンボル:true
+            default:
+              await this.getUnitNameAndSymbolFilteredCardsSnapshot()
+          }
+      }
     },
     setLastFilteredCard() {
       this.lastFilteredCard = this.nextFilteredCards.docs[
         this.nextFilteredCards.size - 1
       ]
+    },
+    displayCards() {
+      const result = this.nextFilteredCards.docs.map((doc) => {
+        const docData = doc.data()
+        this.addSymbolColorData(docData.symbols, docData)
+        return docData
+      })
+      result.forEach((card) => {
+        const newId = card._id.replace('+', 'plus')
+        const imageUrl = '/img/' + card.recording + '/' + newId + '.png'
+        card.image = imageUrl
+        this.filteredCards.push(card)
+      })
+      return result
     },
     async getNoFilteredCardsSnapshot() {
       if (this.lastFilteredCard) {
@@ -348,7 +397,6 @@ export default {
       setTimeout(async () => {
         await this.getFilteredCardsSnapshot()
         // 取得したカードが10未満ならスクロール終了
-        console.log(this.nextFilteredCards)
         if (this.nextFilteredCards.size < 10) {
           $state.complete()
         } else {
@@ -356,47 +404,6 @@ export default {
           $state.loaded()
         }
       }, 100)
-    },
-    async getFilteredCardsSnapshot() {
-      switch (this.unitNameFilter) {
-        // ユニット名でフィルターされていない時
-        case '':
-          switch (this.symbolFilter) {
-            // ユニット名:false、シンボル:false
-            case '':
-              await this.getNoFilteredCardsSnapshot()
-              break
-            // ユニット名:false、シンボル:true
-            default:
-              await this.getSymbolFilteredCardsSnapshot()
-          }
-          break
-        // ユニット名でフィルターされている時
-        default:
-          switch (this.symbolFilter) {
-            // ユニット名:true、シンボル:false
-            case '':
-              await this.getUnitNameFilteredCardsSnapshot()
-              break
-            // ユニット名:true、シンボル:true
-            default:
-              await this.getUnitNameAndSymbolFilteredCardsSnapshot()
-          }
-      }
-    },
-    displayCards() {
-      const result = this.nextFilteredCards.docs.map((doc) => {
-        const docData = doc.data()
-        this.addSymbolColorData(docData.symbols, docData)
-        return docData
-      })
-      result.forEach((card) => {
-        const newId = card._id.replace('+', 'plus')
-        const imageUrl = '/img/' + card.recording + '/' + newId + '.png'
-        card.image = imageUrl
-        this.filteredCards.push(card)
-      })
-      return result
     },
     addSymbolColorData(symbols, data) {
       switch (symbols[1]) {
