@@ -1,101 +1,67 @@
 <template>
   <v-container>
+    <!--▼ 検索ドロワー ****************************************▼-->
     <v-navigation-drawer
-      v-model="searchDrawer"
+      v-model="drawer"
       app
       clipped
       width="400"
       mobile-breakpoint="500"
     >
-      <v-container>
-        <v-tabs v-model="tab" grow>
-          <v-tab>ALL</v-tab>
-          <v-tab><v-icon>mdi-bookmark-multiple</v-icon></v-tab>
-        </v-tabs>
-        <v-container>
-          <v-select
-            v-model="selectedSymbol"
-            :items="selectItems"
-            :item-color="selectItems.color"
-            label="シンボルで絞り込む"
-            item-text="symbol"
-            item-value="symbol"
-            prepend-inner-icon="mdi-filter"
-            clearable
-            @change="getSymbolFilterCardsSnapshot(selectedSymbol)"
-          ></v-select>
-        </v-container>
+      <!--▼ シンボルフィルター ****************************************▼-->
+      <v-container class="pb-0">
+        <v-select
+          v-model="symbolFilter"
+          :items="symbolFilterItems"
+          label="シンボルで絞り込み"
+          prepend-inner-icon="mdi-filter"
+          clearable
+          outlined
+          @change="getSymbolFilterCardsSnapshot(symbolFilter)"
+        ></v-select>
+      </v-container>
+      <!--▲ シンボルフィルター ****************************************▲-->
+
+      <!--▼ ユニット名フィルター ****************************************▼-->
+      <v-container class="py-0">
         <v-autocomplete
           v-model="unitNameFilter"
-          :items="unitNames"
-          label="ユニット名で検索"
+          :items="unitNameFilterItems"
+          label="ユニット名で絞り込み"
           prepend-inner-icon="mdi-database-search"
           clearable
           outlined
           @input="filterUnitName(unitNameFilter)"
         >
         </v-autocomplete>
-        <v-tabs-items v-model="tab">
-          <v-tab-item>
-            <v-list class="py-0 overflow-y-auto" height="450" outlined>
-              <template v-for="(card, index) in cardList">
-                <v-list-item
-                  :key="'all' + card._id"
-                  :class="card.color"
-                  class="pl-0"
-                  three-line
-                  @click.prevent="cards.push(card)"
-                >
-                  <v-list-item-avatar
-                    class="ma-0 mr-2"
-                    tile
-                    size="88"
-                    height="100%"
-                  >
-                    <v-img :src="card.image" />
-                  </v-list-item-avatar>
-                  <v-list-item-content>
-                    <v-list-item-subtitle
-                      v-text="card._id"
-                    ></v-list-item-subtitle>
-                    <v-list-item-subtitle
-                      v-text="card.title"
-                    ></v-list-item-subtitle>
-                    <v-list-item-title
-                      v-text="card.unitName"
-                    ></v-list-item-title>
-                  </v-list-item-content>
-                  <v-list-item-action>
-                    <v-btn outlined>
-                      <v-icon @click.prevent="markCards.push(card)"
-                        >mdi-star</v-icon
-                      >
-                    </v-btn>
-                  </v-list-item-action>
-                </v-list-item>
-                <v-divider
-                  v-if="index < cardList.length - 1"
-                  :key="index"
-                ></v-divider>
-              </template>
-              <infinite-loading
-                ref="infiniteLoading"
-                spinner="spiral"
-                @infinite="infiniteHandler"
-              >
-                <span slot="no-more">No More Cards</span>
-                <span slot="no-results">No Data</span>
-              </infinite-loading>
-            </v-list>
-          </v-tab-item>
-          <v-tab-item>
-            <v-list height="400" class="overflow-y-auto">
+      </v-container>
+      <!--▲ ユニット名フィルター ****************************************▲-->
+
+      <!--▼ タブ選択画面 ****************************************▼-->
+      <v-tabs v-model="tab" grow>
+        <v-tab><v-icon>mdi-cards</v-icon>All Cards</v-tab>
+        <v-tab><v-icon>mdi-bookmark-multiple</v-icon>Bookmark</v-tab>
+      </v-tabs>
+      <!--▲ タブ選択画面 ****************************************▲-->
+
+      <v-tabs-items v-model="tab">
+        <!--▼ タブ内容1:All Cards ****************************************▼-->
+        <v-tab-item>
+          <v-list class="py-0 overflow-y-auto" height="450" outlined>
+            <template v-for="(card, index) in filteredCards">
               <v-list-item
-                v-for="card in markCards"
-                :key="'mark' + card._id"
-                @click="cards.push(card)"
+                :key="'all' + card._id"
+                :class="card.color"
+                class="pl-0"
+                three-line
+                @click.prevent="myDeckCards.push(card)"
               >
-                <v-list-item-avatar>
+                <v-list-item-avatar
+                  class="ma-0 mr-2"
+                  tile
+                  size="88"
+                  height="100%"
+                >
                   <v-img :src="card.image" />
                 </v-list-item-avatar>
                 <v-list-item-content>
@@ -107,20 +73,65 @@
                   ></v-list-item-subtitle>
                   <v-list-item-title v-text="card.unitName"></v-list-item-title>
                 </v-list-item-content>
+                <v-list-item-action>
+                  <v-btn outlined>
+                    <v-icon @click.prevent="markCards.push(card)"
+                      >mdi-bookmark</v-icon
+                    >
+                  </v-btn>
+                </v-list-item-action>
               </v-list-item>
-            </v-list>
-          </v-tab-item>
-        </v-tabs-items>
-      </v-container>
-    </v-navigation-drawer>
+              <v-divider
+                v-if="index < filteredCards.length - 1"
+                :key="index"
+              ></v-divider>
+            </template>
+            <infinite-loading
+              ref="infiniteLoading"
+              spinner="spiral"
+              @infinite="infiniteHandler"
+            >
+              <span slot="no-more">No More Cards</span>
+              <span slot="no-results">No Data</span>
+            </infinite-loading>
+          </v-list>
+        </v-tab-item>
+        <!--▲ タブ内容1:All Cards ****************************************▲-->
 
-    <div class="d-flex justify-space-between">
+        <!--▼ タブ内容2:Bookmark ****************************************▼-->
+        <v-tab-item>
+          <v-list height="400" class="overflow-y-auto">
+            <v-list-item
+              v-for="card in markCards"
+              :key="'mark' + card._id"
+              @click="myDeckCards.push(card)"
+            >
+              <v-list-item-avatar>
+                <v-img :src="card.image" />
+              </v-list-item-avatar>
+              <v-list-item-content>
+                <v-list-item-subtitle v-text="card._id"></v-list-item-subtitle>
+                <v-list-item-subtitle
+                  v-text="card.title"
+                ></v-list-item-subtitle>
+                <v-list-item-title v-text="card.unitName"></v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-tab-item>
+        <!--▲ タブ内容2:Bookmark ****************************************▲-->
+      </v-tabs-items>
+    </v-navigation-drawer>
+    <!--▲ 検索ドロワー ****************************************▲-->
+
+    <!--▼ メイン画面 ****************************************▼-->
+    <v-container class="d-flex justify-space-between">
       <v-form
-        v-model="deckName"
+        v-model="myDeckName"
         class="w-20 d-flex align-center"
         @submit.prevent
       >
-        <v-text-field type="text" label="DeckName"></v-text-field>
+        <v-text-field type="text" label="myDeckName"></v-text-field>
       </v-form>
       <div class="d-flex align-center">
         <div>
@@ -128,24 +139,25 @@
           <v-btn class="info" width="100" @click="saveDeck">保存</v-btn>
         </div>
       </div>
-    </div>
+    </v-container>
     <draggable
-      v-model="cards"
+      v-model="myDeckCards"
       class="d-flex flex-wrap"
-      group="cards"
+      group="myDeckCards"
       :animation="200"
       @start="drag = true"
       @end="drag = false"
       @change="onMoveCard"
     >
       <PickedCard
-        v-for="(card, index) in cards"
+        v-for="(card, index) in myDeckCards"
         :key="index"
         :img="card.image"
       ></PickedCard>
     </draggable>
-    {{ cards }}
+    {{ myDeckCards }}
   </v-container>
+  <!--▲ メイン画面 ****************************************▲-->
 </template>
 
 <script>
@@ -158,69 +170,39 @@ export default {
   },
   data() {
     return {
-      tab: null,
-      deckName: '',
-      searchDrawer: null,
-      nextPage: null,
-      lastCard: null,
-      selectedSymbol: '',
-      unitNameFilter: '',
-      unitNames: ['マルス', 'シーダ', 'クロム', 'アルフォンス', 'リョウマ'],
-      selectItems: [
-        {
-          name: '無',
-          symbol: 'なし',
-          color: 'grey',
-        },
-        {
-          name: '赤',
-          symbol: '光の剣',
-          color: 'red',
-        },
-        {
-          name: '青',
-          symbol: '聖痕',
-          color: 'blue',
-        },
-        {
-          name: '白',
-          symbol: '白夜',
-          color: 'grey lighten-2',
-        },
-        {
-          name: '黒',
-          symbol: '暗夜',
-          color: 'black',
-        },
-        {
-          name: '緑',
-          symbol: 'メダリオン',
-          color: 'green',
-        },
-        {
-          name: '紫',
-          symbol: '神器',
-          color: 'purple',
-        },
-        {
-          name: '黄',
-          symbol: '聖戦旗',
-          color: 'orange',
-        },
-        {
-          name: '茶',
-          symbol: '女神紋',
-          color: 'brown',
-        },
-      ],
-      cards: [],
+      myDeckCards: [],
       markCards: [],
-      cardList: [],
+      filteredCards: [],
+      myDeckName: '',
+      // UIコンポーネント
+      drawer: null,
+      tab: null,
+      // ページネーション
+      nextDisplayCards: null,
+      lastDisplayCard: null,
+      // シンボルフィルター
+      symbolFilter: '',
+      symbolFilterItems: [
+        'なし',
+        '光の剣',
+        '聖痕',
+        '白夜',
+        '暗夜',
+        'メダリオン',
+        '神器',
+        '聖戦旗',
+        '女神紋',
+      ],
+      // ユニット名フィルター
+      unitNameFilter: '',
+      unitNameFilterItems: [
+        'マルス',
+        'シーダ',
+        'クロム',
+        'アルフォンス',
+        'リョウマ',
+      ],
     }
-  },
-  async created() {
-    await this.getAllCardsSnapshot()
-    this.displayCards()
   },
   methods: {
     saveDeck() {
@@ -237,20 +219,18 @@ export default {
 
       if (newIndex > oldIndex) {
         // 後ろにカードを移動した場合
-
         // 配列の順序をreverseして、末尾から探索できるようにしておく
         // これにより、ドラッグして移動したカードが元より後ろの順で検知される
-        this.cards.reverse()
+        this.myDeckCards.reverse()
 
-        const cardObjects = this.toCardObjects(this.cards)
-        this.cards = this.toArrayCards(cardObjects)
+        const cardObjects = this.toCardObjects(this.myDeckCards)
+        this.myDeckCards = this.toArrayCards(cardObjects)
         // 逆順にしたものを元の順に戻す
-        this.cards.reverse()
+        this.myDeckCards.reverse()
       } else if (newIndex < oldIndex) {
         // 前にカードを移動した場合
-
-        const cardObjects = this.toCardObjects(this.cards)
-        this.cards = this.toArrayCards(cardObjects)
+        const cardObjects = this.toCardObjects(this.myDeckCards)
+        this.myDeckCards = this.toArrayCards(cardObjects)
       }
     },
     toCardObjects(cards) {
@@ -266,12 +246,10 @@ export default {
         // 種類順の配列に含まれているかどうか
         if (isCardInObjects.length === 0) {
           // 新規のカードの場合
-
           // カードのオブジェクトをresultに新規追加する
           result.push({ img: card, count: 1 })
         } else {
           // 既存のカードの場合
-
           // 該当のオブジェクトのcountを1増やす
           const objectIndex = result.findIndex((obj) => obj.img === card)
           result[objectIndex].count++
@@ -291,22 +269,24 @@ export default {
       return result
     },
     async getAllCardsSnapshot() {
-      if (this.lastCard) {
-        this.nextPage = await this.$firestore
+      if (this.lastDisplayCard) {
+        this.nextDisplayCards = await this.$firestore
           .collection('Cards')
-          .startAfter(this.lastCard)
+          .startAfter(this.lastDisplayCard)
           .limit(10)
           .get()
       } else {
-        this.nextPage = await this.$firestore
+        this.nextDisplayCards = await this.$firestore
           .collection('Cards')
           .limit(10)
           .get()
       }
-      this.lastCard = this.nextPage.docs[this.nextPage.size - 1]
+      this.lastDisplayCard = this.nextDisplayCards.docs[
+        this.nextDisplayCards.size - 1
+      ]
     },
     displayCards() {
-      const cardData = this.nextPage.docs.map((doc) => {
+      const cardData = this.nextDisplayCards.docs.map((doc) => {
         const result = doc.data()
         switch (result.symbols[1]) {
           case '聖痕':
@@ -352,12 +332,11 @@ export default {
         const newId = card._id.replace('+', 'plus')
         const imageUrl = '/img/' + card.recording + '/' + newId + '.png'
         card.image = imageUrl
-        this.cardList.push(card)
+        this.filteredCards.push(card)
       })
       return cardData
     },
     infiniteHandler($state) {
-      console.log('inifinite')
       setTimeout(async () => {
         await this.getAllCardsSnapshot()
         this.displayCards()
@@ -370,33 +349,36 @@ export default {
         this.displayCards()
         return
       }
-      this.nextPage = await this.$firestore
+      this.nextDisplayCards = await this.$firestore
         .collection('Cards')
         .where('unitName', '==', unitName)
         .limit(10)
         .get()
-      this.lastCard = this.nextPage.docs[this.nextPage.size - 1]
-      this.cardList = []
+      this.lastDisplayCard = this.nextDisplayCards.docs[
+        this.nextDisplayCards.size - 1
+      ]
+      this.filteredCards = []
       this.displayCards()
     },
     async getSymbolFilterCardsSnapshot(symbol) {
       if (!symbol) {
         console.log('clear filter')
-        this.cardList = []
-        this.lastCard = null
-        this.nextPage = null
+        this.filteredCards = []
+        this.lastDisplayCard = null
+        this.nextDisplayCards = null
         await this.getAllCardsSnapshot()
         this.displayCards()
         return
       }
-      console.log(symbol)
-      this.nextPage = await this.$firestore
+      this.nextDisplayCards = await this.$firestore
         .collection('Cards')
         .where('symbols', 'array-contains', symbol)
         .limit(10)
         .get()
-      this.lastCard = this.nextPage.docs[this.nextPage.size - 1]
-      this.cardList = []
+      this.lastDisplayCard = this.nextDisplayCards.docs[
+        this.nextDisplayCards.size - 1
+      ]
+      this.filteredCards = []
       this.displayCards()
     },
   },
