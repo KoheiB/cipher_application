@@ -8,22 +8,8 @@
       width="400"
       mobile-breakpoint="500"
     >
-      <!--▼ シンボルフィルター ****************************************▼-->
-      <v-container class="pb-0">
-        <v-select
-          v-model="symbolFilter"
-          :items="symbolFilterItems"
-          label="シンボルで絞り込み"
-          prepend-inner-icon="mdi-filter"
-          clearable
-          outlined
-          @change="getSymbolFilterCardsSnapshot(symbolFilter)"
-        ></v-select>
-      </v-container>
-      <!--▲ シンボルフィルター ****************************************▲-->
-
       <!--▼ ユニット名フィルター ****************************************▼-->
-      <v-container class="py-0">
+      <v-container class="pb-0">
         <v-autocomplete
           v-model="unitNameFilter"
           :items="unitNameFilterItems"
@@ -31,11 +17,25 @@
           prepend-inner-icon="mdi-database-search"
           clearable
           outlined
-          @input="filterUnitName(unitNameFilter)"
+          @change="changeFilter()"
         >
         </v-autocomplete>
       </v-container>
       <!--▲ ユニット名フィルター ****************************************▲-->
+
+      <!--▼ シンボルフィルター ****************************************▼-->
+      <v-container class="py-0">
+        <v-select
+          v-model="symbolFilter"
+          :items="symbolFilterItems"
+          label="シンボルで絞り込み"
+          prepend-inner-icon="mdi-filter"
+          clearable
+          outlined
+          @change="changeFilter()"
+        ></v-select>
+      </v-container>
+      <!--▲ シンボルフィルター ****************************************▲-->
 
       <!--▼ タブ選択画面 ****************************************▼-->
       <v-tabs v-model="tab" grow>
@@ -54,7 +54,7 @@
                 :class="card.color"
                 class="pl-0"
                 three-line
-                @click.prevent="myDeckCards.push(card)"
+                @click="myDeckCards.push(card)"
               >
                 <v-list-item-avatar
                   class="ma-0 mr-2"
@@ -74,10 +74,8 @@
                   <v-list-item-title v-text="card.unitName"></v-list-item-title>
                 </v-list-item-content>
                 <v-list-item-action>
-                  <v-btn outlined>
-                    <v-icon @click.prevent="markCards.push(card)"
-                      >mdi-bookmark</v-icon
-                    >
+                  <v-btn outlined @click.prevent="markCards.push(card)">
+                    <v-icon>mdi-bookmark</v-icon>
                   </v-btn>
                 </v-list-item-action>
               </v-list-item>
@@ -170,16 +168,26 @@ export default {
   },
   data() {
     return {
+      myDeckName: '',
       myDeckCards: [],
       markCards: [],
       filteredCards: [],
-      myDeckName: '',
       // UIコンポーネント
       drawer: null,
       tab: null,
       // ページネーション
-      nextDisplayCards: null,
-      lastDisplayCard: null,
+      nextFilteredCards: null,
+      lastFilteredCard: null,
+      // ユニット名フィルター
+      unitNameFilter: '',
+      unitNameFilterItems: [
+        'マルス',
+        'シーダ',
+        'クロム',
+        'アルフォンス',
+        'リョウマ',
+        'ポー',
+      ],
       // シンボルフィルター
       symbolFilter: '',
       symbolFilterItems: [
@@ -192,15 +200,6 @@ export default {
         '神器',
         '聖戦旗',
         '女神紋',
-      ],
-      // ユニット名フィルター
-      unitNameFilter: '',
-      unitNameFilterItems: [
-        'マルス',
-        'シーダ',
-        'クロム',
-        'アルフォンス',
-        'リョウマ',
       ],
     }
   },
@@ -268,118 +267,176 @@ export default {
       })
       return result
     },
-    async getAllCardsSnapshot() {
-      if (this.lastDisplayCard) {
-        this.nextDisplayCards = await this.$firestore
+    changeFilter() {
+      this.getFilteredCardsSnapshot()
+      this.displayCards()
+    },
+    setLastFilteredCard() {
+      this.lastFilteredCard = this.nextFilteredCards.docs[
+        this.nextFilteredCards.size - 1
+      ]
+    },
+    async getNoFilteredCardsSnapshot() {
+      if (this.lastFilteredCard) {
+        this.nextFilteredCards = await this.$firestore
           .collection('Cards')
-          .startAfter(this.lastDisplayCard)
+          .startAfter(this.lastFilteredCard)
           .limit(10)
           .get()
       } else {
-        this.nextDisplayCards = await this.$firestore
+        this.nextFilteredCards = await this.$firestore
           .collection('Cards')
           .limit(10)
           .get()
       }
-      this.lastDisplayCard = this.nextDisplayCards.docs[
-        this.nextDisplayCards.size - 1
-      ]
+      this.setLastFilteredCard()
+    },
+    async getUnitNameFilteredCardsSnapshot() {
+      if (this.lastFilteredCard) {
+        this.nextFilteredCards = await this.$firestore
+          .collection('Cards')
+          .where('unitName', '==', this.unitNameFilter)
+          .startAfter(this.lastFilteredCard)
+          .limit(10)
+          .get()
+      } else {
+        this.nextFilteredCards = await this.$firestore
+          .collection('Cards')
+          .where('unitName', '==', this.unitNameFilter)
+          .limit(10)
+          .get()
+      }
+      this.setLastFilteredCard()
+    },
+    async getSymbolFilteredCardsSnapshot() {
+      if (this.lastFilteredCard) {
+        this.nextFilteredCards = await this.$firestore
+          .collection('Cards')
+          .where('symbols', 'array-contains', this.symbolFilter)
+          .startAfter(this.lastFilteredCard)
+          .limit(10)
+          .get()
+      } else {
+        this.nextFilteredCards = await this.$firestore
+          .collection('Cards')
+          .where('symbols', 'array-contains', this.symbolFilter)
+          .limit(10)
+          .get()
+      }
+      this.setLastFilteredCard()
+    },
+    async getUnitNameAndSymbolFilteredCardsSnapshot() {
+      if (this.lastFilteredCard) {
+        this.nextFilteredCards = await this.$firestore
+          .collection('Cards')
+          .where('unitName', '==', this.unitNameFilter)
+          .where('symbols', 'array-contains', this.symbolFilter)
+          .startAfter(this.lastFilteredCard)
+          .limit(10)
+          .get()
+      } else {
+        this.nextFilteredCards = await this.$firestore
+          .collection('Cards')
+          .where('unitName', '==', this.unitNameFilter)
+          .where('symbols', 'array-contains', this.symbolFilter)
+          .limit(10)
+          .get()
+      }
+      this.setLastFilteredCard()
+    },
+    infiniteHandler($state) {
+      setTimeout(async () => {
+        await this.getFilteredCardsSnapshot()
+        // 取得したカードが10未満ならスクロール終了
+        console.log(this.nextFilteredCards)
+        if (this.nextFilteredCards.size < 10) {
+          $state.complete()
+        } else {
+          this.displayCards()
+          $state.loaded()
+        }
+      }, 100)
+    },
+    async getFilteredCardsSnapshot() {
+      switch (this.unitNameFilter) {
+        // ユニット名でフィルターされていない時
+        case '':
+          switch (this.symbolFilter) {
+            // ユニット名:false、シンボル:false
+            case '':
+              await this.getNoFilteredCardsSnapshot()
+              break
+            // ユニット名:false、シンボル:true
+            default:
+              await this.getSymbolFilteredCardsSnapshot()
+          }
+          break
+        // ユニット名でフィルターされている時
+        default:
+          switch (this.symbolFilter) {
+            // ユニット名:true、シンボル:false
+            case '':
+              await this.getUnitNameFilteredCardsSnapshot()
+              break
+            // ユニット名:true、シンボル:true
+            default:
+              await this.getUnitNameAndSymbolFilteredCardsSnapshot()
+          }
+      }
     },
     displayCards() {
-      const cardData = this.nextDisplayCards.docs.map((doc) => {
-        const result = doc.data()
-        switch (result.symbols[1]) {
-          case '聖痕':
-            result.color = 'skyblue'
-            break
-          case '暗夜':
-            result.color = 'pink'
-            break
-          default:
-            switch (result.symbols[0]) {
-              case 'なし':
-                result.color = 'cyan lighten-5'
-                break
-              case '光の剣':
-                result.color = 'red lighten-3'
-                break
-              case '聖痕':
-                result.color = 'blue lighten-4'
-                break
-              case '白夜':
-                result.color = 'grey lighten-4'
-                break
-              case '暗夜':
-                result.color = 'grey lighten-1'
-                break
-              case 'メダリオン':
-                result.color = 'green lighten-3'
-                break
-              case '神器':
-                result.color = 'deep-purple lighten-3'
-                break
-              case '聖戦旗':
-                result.color = 'yellow lighten-4'
-                break
-              case '女神紋':
-                result.color = 'brown lighten-3'
-                break
-            }
-        }
-        return result
+      const result = this.nextFilteredCards.docs.map((doc) => {
+        const docData = doc.data()
+        this.addSymbolColorData(docData.symbols, docData)
+        return docData
       })
-      cardData.forEach((card) => {
+      result.forEach((card) => {
         const newId = card._id.replace('+', 'plus')
         const imageUrl = '/img/' + card.recording + '/' + newId + '.png'
         card.image = imageUrl
         this.filteredCards.push(card)
       })
-      return cardData
+      return result
     },
-    infiniteHandler($state) {
-      setTimeout(async () => {
-        await this.getAllCardsSnapshot()
-        this.displayCards()
-        this.displayCards.length <= 10 ? $state.loaded() : $state.complete()
-      }, 500)
-    },
-    async filterUnitName(unitName) {
-      if (!unitName) {
-        this.getAllCardsSnapshot()
-        this.displayCards()
-        return
+    addSymbolColorData(symbols, data) {
+      switch (symbols[1]) {
+        case '聖痕':
+          data.color = 'skyblue'
+          break
+        case '暗夜':
+          data.color = 'pink'
+          break
+        default:
+          switch (symbols[0]) {
+            case 'なし':
+              data.color = 'cyan lighten-5'
+              break
+            case '光の剣':
+              data.color = 'red lighten-3'
+              break
+            case '聖痕':
+              data.color = 'blue lighten-4'
+              break
+            case '白夜':
+              data.color = 'grey lighten-4'
+              break
+            case '暗夜':
+              data.color = 'grey lighten-1'
+              break
+            case 'メダリオン':
+              data.color = 'green lighten-3'
+              break
+            case '神器':
+              data.color = 'deep-purple lighten-3'
+              break
+            case '聖戦旗':
+              data.color = 'yellow lighten-4'
+              break
+            case '女神紋':
+              data.color = 'brown lighten-3'
+              break
+          }
       }
-      this.nextDisplayCards = await this.$firestore
-        .collection('Cards')
-        .where('unitName', '==', unitName)
-        .limit(10)
-        .get()
-      this.lastDisplayCard = this.nextDisplayCards.docs[
-        this.nextDisplayCards.size - 1
-      ]
-      this.filteredCards = []
-      this.displayCards()
-    },
-    async getSymbolFilterCardsSnapshot(symbol) {
-      if (!symbol) {
-        console.log('clear filter')
-        this.filteredCards = []
-        this.lastDisplayCard = null
-        this.nextDisplayCards = null
-        await this.getAllCardsSnapshot()
-        this.displayCards()
-        return
-      }
-      this.nextDisplayCards = await this.$firestore
-        .collection('Cards')
-        .where('symbols', 'array-contains', symbol)
-        .limit(10)
-        .get()
-      this.lastDisplayCard = this.nextDisplayCards.docs[
-        this.nextDisplayCards.size - 1
-      ]
-      this.filteredCards = []
-      this.displayCards()
     },
   },
 }
