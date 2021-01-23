@@ -282,6 +282,7 @@ export default {
       await this.getFilteredCardsSnapshot()
       await this.setLastFilteredCard()
       await this.displayCards()
+      await this.$refs.infiniteLoading.stateChanger.reset()
     },
     // フィルターをリセット
     resetFilter() {
@@ -450,9 +451,6 @@ export default {
         await this.displayCards()
         // 取得したカードが10未満ならスクロール終了
         if (this.nextFilteredCards.size <= 9) {
-          await this.getFilteredCardsSnapshot()
-          await this.setLastFilteredCard()
-          await this.displayCards()
           $state.complete()
         } else {
           $state.loaded()
