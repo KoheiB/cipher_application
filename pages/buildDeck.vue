@@ -1,6 +1,12 @@
 <template>
   <v-container>
-    <v-navigation-drawer v-model="searchDrawer" app clipped width="400">
+    <v-navigation-drawer
+      v-model="searchDrawer"
+      app
+      clipped
+      width="400"
+      mobile-breakpoint="500"
+    >
       <v-container>
         <v-tabs v-model="tab" grow>
           <v-tab>ALL</v-tab>
@@ -35,11 +41,17 @@
                 <v-list-item
                   :key="card._id"
                   :class="card.color"
+                  class="pl-0"
                   three-line
                   @click.prevent="cards.push(card)"
                 >
-                  <v-list-item-avatar>
-                    <v-img :src="card.avatar" />
+                  <v-list-item-avatar
+                    class="ma-0 mr-2"
+                    tile
+                    size="88"
+                    height="100%"
+                  >
+                    <v-img :src="card.image" />
                   </v-list-item-avatar>
                   <v-list-item-content>
                     <v-list-item-subtitle
@@ -83,7 +95,7 @@
                 @click="cards.push(card)"
               >
                 <v-list-item-avatar>
-                  <v-img :src="card.avatar" />
+                  <v-img :src="card.image" />
                 </v-list-item-avatar>
                 <v-list-item-content>
                   <v-list-item-subtitle
@@ -131,6 +143,7 @@
         :img="card.image"
       ></PickedCard>
     </draggable>
+    {{ cards }}
   </v-container>
 </template>
 
@@ -312,7 +325,7 @@ export default {
                 result.color = 'red lighten-3'
                 break
               case '聖痕':
-                result.color = 'blue accent-1'
+                result.color = 'blue lighten-4'
                 break
               case '白夜':
                 result.color = 'grey lighten-4'
@@ -327,7 +340,7 @@ export default {
                 result.color = 'deep-purple lighten-3'
                 break
               case '聖戦旗':
-                result.color = 'amber lighten-4'
+                result.color = 'yellow lighten-4'
                 break
               case '女神紋':
                 result.color = 'brown lighten-3'
@@ -337,7 +350,9 @@ export default {
         return result
       })
       cardData.forEach((card) => {
-        card.image = require('~/static/img/B01/B01-001SR.png')
+        const newId = card._id.replace('+', 'plus')
+        const imageUrl = '/img/' + card.recording + '/' + newId + '.png'
+        card.image = imageUrl
         this.cardList.push(card)
       })
       return cardData
