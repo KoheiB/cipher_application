@@ -9,25 +9,25 @@
                     - cardId : String
                     - title : String
                     - unitName : String
-                    - symbols : array[String]
+                    - symbols : Array[String]
                     - count : Number
                     - displayOrder : Number
                 - heroCard : Map
                   - cardId : String
                   - title : String
                   - unitName : String
-                  - symbols : array[String]
+                  - symbols : Array[String]
                 - mainClassChangeCard : Map
                   - cardId : String
                   - title : String
                   - unitName : String
-                  - symbols : array[String]
+                  - symbols : Array[String]
                 - MarkCards : SubCollection
                   - DocumentId : Cards.DocumentId
                     - cardId : String
                     - title : String
                     - unitName : String
-                    - symbols : array[String]
+                    - symbols : Array[String]
                     - count : Number
                     - displayOrder : Number
                 - isPublic : Boolean
@@ -57,14 +57,14 @@
       - unitName: String
       - sortie_cost: String
       - cc_cost: String
-      - symbols: array[String]
+      - symbols: Array[String]
       - gender:  String
       - weapon: String
-      - types : array[String]
-      - n_skills : Map
+      - types : Array[String]
+      - n_skills : Array[Map]
         - name : String
         - text : String
-      - s_skills : Map
+      - s_skills : Array[Map]
         - name : String
         - text : String
       - c_power: String
