@@ -18,9 +18,10 @@
             :items="selectItems"
             :item-color="selectItems.color"
             label="シンボルで絞り込む"
-            prepend-inner-icon="mdi-filter"
             item-text="symbol"
             item-value="symbol"
+            prepend-inner-icon="mdi-filter"
+            clearable
             @change="getSymbolFilterCardsSnapshot(selectedSymbol)"
           ></v-select>
         </v-container>
@@ -39,7 +40,7 @@
             <v-list height="400" class="overflow-y-auto" outlined>
               <template v-for="(card, index) in cardList">
                 <v-list-item
-                  :key="card._id"
+                  :key="'all' + card._id"
                   :class="card.color"
                   class="pl-0"
                   three-line
@@ -91,7 +92,7 @@
             <v-list height="400" class="overflow-y-auto">
               <v-list-item
                 v-for="card in markCards"
-                :key="card._id"
+                :key="'mark' + card._id"
                 @click="cards.push(card)"
               >
                 <v-list-item-avatar>
@@ -138,8 +139,8 @@
       @change="onMoveCard"
     >
       <PickedCard
-        v-for="(card, i) in cards"
-        :key="i"
+        v-for="(card, index) in cards"
+        :key="index"
         :img="card.image"
       ></PickedCard>
     </draggable>
@@ -162,15 +163,10 @@ export default {
       searchDrawer: null,
       nextPage: null,
       lastCard: null,
-      selectedSymbol: '指定なし',
+      selectedSymbol: '',
       unitNameFilter: '',
-      unitNames: ['マルス', 'シーダ', 'ジェイガン'],
+      unitNames: ['マルス', 'シーダ', 'クロム', 'アルフォンス', 'リョウマ'],
       selectItems: [
-        {
-          name: '全',
-          symbol: '指定なし',
-          color: 'grey lighten-1',
-        },
         {
           name: '無',
           symbol: '（なし）',
@@ -312,7 +308,7 @@ export default {
     displayCards() {
       const cardData = this.nextPage.docs.map((doc) => {
         const result = doc.data()
-        switch (result.symbol2) {
+        switch (result.symbols[1]) {
           case '聖痕':
             result.color = 'skyblue'
             break
@@ -320,7 +316,10 @@ export default {
             result.color = 'pink'
             break
           default:
-            switch (result.symbol1) {
+            switch (result.symbols[0]) {
+              case '':
+                result.color = 'cyan lighten-5'
+                break
               case '光の剣':
                 result.color = 'red lighten-3'
                 break
@@ -363,15 +362,44 @@ export default {
         await this.getAllCardsSnapshot()
         this.displayCards()
         this.displayCards.length <= 10 ? $state.loaded() : $state.complete()
-      }, 1000)
+      }, 500)
     },
-    filterUnitName(unitName) {
-      this.cardList.filter((card) => card.unitName === unitName)
-    },
-    async getSymbolFilterCardsSnapshot(symbol) {
+    async filterUnitName(unitName) {
+      if (!unitName) {
+        this.getAllCardsSnapshot()
+        this.displayCards()
+        return
+      }
       this.nextPage = await this.$firestore
         .collection('Cards')
-        .where('symbol1', '==', symbol)
+        .where('unitName', '==', unitName)
+        .limit(10)
+        .get()
+      this.lastCard = this.nextPage.docs[this.nextPage.size - 1]
+      this.cardList = []
+      this.displayCards()
+    },
+    async getSymbolFilterCardsSnapshot(symbol) {
+      if (!symbol) {
+        this.getAllCardsSnapshot()
+        this.displayCards()
+        return
+      }
+      if (symbol === '（なし）') {
+        symbol = ''
+        this.nextPage = await this.$firestore
+          .collection('Cards')
+          .where('symbols', 'array-contains', symbol)
+          .limit(10)
+          .get()
+        this.lastCard = this.nextPage.docs[this.nextPage.size - 1]
+        this.cardList = []
+        this.displayCards()
+        return
+      }
+      this.nextPage = await this.$firestore
+        .collection('Cards')
+        .where('symbols', 'array-contains', symbol)
         .limit(10)
         .get()
       this.lastCard = this.nextPage.docs[this.nextPage.size - 1]
