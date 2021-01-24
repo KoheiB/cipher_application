@@ -91,9 +91,9 @@
               ></v-divider>
             </template>
             <infinite-loading
-              ref="infiniteLoading"
+              ref="filteredCardsInfiniteLoading"
               spinner="spiral"
-              @infinite="infiniteHandler"
+              @infinite="filteredCardsInfiniteHandler"
             >
               <span slot="no-more">No More Cards</span>
               <span slot="no-results">No Data</span>
@@ -102,25 +102,53 @@
         </v-tab-item>
         <!--▲ タブ内容1:Search ****************************************▲-->
 
-        <!--▼ タブ内容2:Bookmark ****************************************▼-->
+        <!--TODO▼ タブ内容2:Bookmark ****************************************▼-->
         <v-tab-item>
-          <v-list height="400" class="overflow-y-auto">
-            <v-list-item
-              v-for="card in markCards"
-              :key="'mark-' + card._id"
-              @click="myDeckCards.push(card)"
+          <v-list class="py-0 overflow-y-auto" height="450" outlined>
+            <template v-for="(card, index) in markCards">
+              <v-list-item
+                :key="'mark-' + card._id"
+                :class="card.color"
+                class="pl-0"
+                three-line
+                @click="myDeckCards.push(card)"
+              >
+                <v-list-item-avatar
+                  class="ma-0 mr-2"
+                  tile
+                  size="88"
+                  height="100%"
+                >
+                  <v-img :src="card.image" />
+                </v-list-item-avatar>
+                <v-list-item-content>
+                  <v-list-item-subtitle
+                    v-text="card._id"
+                  ></v-list-item-subtitle>
+                  <v-list-item-subtitle
+                    v-text="card.title"
+                  ></v-list-item-subtitle>
+                  <v-list-item-title v-text="card.unitName"></v-list-item-title>
+                </v-list-item-content>
+                <v-list-item-action>
+                  <v-btn outlined @click.prevent="markCards.push(card)">
+                    <v-icon>mdi-delete</v-icon>
+                  </v-btn>
+                </v-list-item-action>
+              </v-list-item>
+              <v-divider
+                v-if="index < filteredCards.length - 1"
+                :key="index"
+              ></v-divider>
+            </template>
+            <!-- <infinite-loading
+              ref="markCardsInfiniteLoading"
+              spinner="spiral"
+              @infinite="markCardsInfiniteHandler"
             >
-              <v-list-item-avatar>
-                <v-img :src="card.image" />
-              </v-list-item-avatar>
-              <v-list-item-content>
-                <v-list-item-subtitle v-text="card._id"></v-list-item-subtitle>
-                <v-list-item-subtitle
-                  v-text="card.title"
-                ></v-list-item-subtitle>
-                <v-list-item-title v-text="card.unitName"></v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
+              <span slot="no-more">No More Cards</span>
+              <span slot="no-results">No Data</span>
+            </infinite-loading> -->
           </v-list>
         </v-tab-item>
         <!--▲ タブ内容2:Bookmark ****************************************▲-->
@@ -286,7 +314,7 @@ export default {
       await this.getFilteredCardsSnapshot()
       await this.setLastFilteredCard()
       await this.displayCards()
-      await this.$refs.infiniteLoading.stateChanger.reset()
+      await this.$refs.filteredCardsInfiniteLoading.stateChanger.reset()
     },
     // フィルターをリセット
     resetFilter() {
@@ -447,8 +475,22 @@ export default {
           }
       }
     },
-    // 無限スクロール
-    infiniteHandler($state) {
+    // サーチ無限スクロール
+    filteredCardsInfiniteHandler($state) {
+      setTimeout(async () => {
+        await this.getFilteredCardsSnapshot()
+        await this.setLastFilteredCard()
+        await this.displayCards()
+        // 取得したカードが10未満ならスクロール終了
+        if (this.nextFilteredCards.size <= 9) {
+          $state.complete()
+        } else {
+          $state.loaded()
+        }
+      }, 100)
+    },
+    // TODOマーク無限スクロール
+    markCardsInfiniteHandler($state) {
       setTimeout(async () => {
         await this.getFilteredCardsSnapshot()
         await this.setLastFilteredCard()
