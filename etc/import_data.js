@@ -19,7 +19,7 @@ const arrayChunk = ([...array], size = 1) => {
 const db = admin.firestore();
 const fs = require('fs');
 const csvSync = require('csv-parse/lib/sync');
-const file = './2020-12-31_cipher_data.csv'; //同階層にファイルを置く
+const file = './2021-01-24_cipher_data.csv'; //同階層にファイルを置く
 let data = fs.readFileSync(file); //csvファイルの読み込み
 let responses = csvSync(data);//parse csv
 let objects = []; //この配列の中にパースしたcsvの中身をkey-value形式で入れていく
