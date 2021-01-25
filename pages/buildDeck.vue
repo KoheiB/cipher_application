@@ -13,6 +13,9 @@
         <v-autocomplete
           v-model="unitNameFilter"
           :items="unitNameFilterItems"
+          :filter="filterObject"
+          :search-input="unitNameFilter"
+          item-text="prop1"
           label="ユニット名で検索"
           prepend-inner-icon="mdi-database-search"
           dense
@@ -216,16 +219,22 @@ export default {
       // ユニット名フィルター
       unitNameFilter: undefined,
       unitNameFilterItems: [
-        'マルス',
-        'シーダ',
-        'クロム',
-        'アルフォンス',
-        'リョウマ',
-        'シグレ',
-        'リン',
-        'チキ',
-        'ポー',
+        { prop1: 'マルス', prop2: 'まるす' },
+        { prop1: 'リン', prop2: 'りん' },
+        { prop1: '門番', prop2: 'もんばん' },
+        { prop1: '？？？', prop2: 'はてな' },
       ],
+      // unitNameFilterItems: [
+      //   'マルス',
+      //   'シーダ',
+      //   'クロム',
+      //   'アルフォンス',
+      //   'リョウマ',
+      //   'シグレ',
+      //   'リン',
+      //   'チキ',
+      //   'ポー',
+      // ],
       // シンボルフィルター
       symbolFilter: undefined,
       symbolFilterItems: [
@@ -505,6 +514,14 @@ export default {
       }, 100)
     },
     // ▲ 検索ドロワーに関するメソッド ****************************************▲
+    filterObject(item, queryText, itemText) {
+      return (
+        item.prop1
+          .toLocaleLowerCase()
+          .includes(queryText.toLocaleLowerCase()) ||
+        item.prop2.toLocaleLowerCase().includes(queryText.toLocaleLowerCase())
+      )
+    },
   },
 }
 </script>
