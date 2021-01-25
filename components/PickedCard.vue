@@ -11,6 +11,7 @@ export default {
   props: {
     img: {
       type: String,
+      required: true,
     },
   },
 }
