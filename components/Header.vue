@@ -5,7 +5,7 @@
     <v-spacer></v-spacer>
 
     <v-toolbar-items class="hidden-mobile-and-down">
-      <v-btn-toggle v-model="icon" borderless>
+      <v-btn-toggle borderless>
         <v-btn text nuxt to="buildDeck" class="text-capitalize">
           <v-icon> mdi-file-edit-outline </v-icon>
           <span class="hidden-ipad-and-down header-menu-text">
@@ -31,13 +31,17 @@
       <v-toolbar-items>
         <v-menu offset-y>
           <template v-slot:activator="{ on }">
-            <v-btn v-on="on" style="text-transform: none" text>
+            <v-btn style="text-transform: none" text v-on="on">
               <v-icon> mdi-account</v-icon>
               {{ user.name }}
             </v-btn>
           </template>
           <v-list>
-            <v-list-item v-for="user_menu in user_menus" :key="user_menu" link>
+            <v-list-item
+              v-for="user_menu in user_menus"
+              :key="user_menu.index"
+              link
+            >
               <v-list-item-content>
                 <v-list-item-title
                   @click="
