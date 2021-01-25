@@ -5,7 +5,7 @@
       v-model="drawer"
       app
       clipped
-      width="400"
+      width="360"
       mobile-breakpoint="500"
     >
       <!--▼ ユニット名フィルター ****************************************▼-->
@@ -169,6 +169,7 @@
         <div>
           <v-btn class="primary" width="100" @click="shareDeck">ツイート</v-btn>
           <v-btn class="info" width="100" @click="saveDeck">保存</v-btn>
+          <v-btn @click="drawer = !drawer">ドロワー</v-btn>
         </div>
       </div>
     </v-container>
