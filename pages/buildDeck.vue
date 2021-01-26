@@ -15,9 +15,10 @@
           :items="unitNameFilterItems"
           :filter="filterObject"
           :search-input="unitNameFilter"
-          item-text="prop1"
+          item-text="name"
           label="ユニット名で検索"
           prepend-inner-icon="mdi-database-search"
+          autofocus
           dense
           clearable
           outlined
@@ -199,11 +200,13 @@
 <script>
 import draggable from 'vuedraggable'
 import InfiniteLoading from 'vue-infinite-loading'
+import unitNameFilterItems from '../mixins/UnitNameFilterItems'
 export default {
   components: {
     draggable,
     InfiniteLoading,
   },
+  mixins: [unitNameFilterItems],
   data() {
     return {
       myDeckName: '',
@@ -218,23 +221,6 @@ export default {
       lastFilteredCard: null,
       // ユニット名フィルター
       unitNameFilter: undefined,
-      unitNameFilterItems: [
-        { prop1: 'マルス', prop2: 'まるす' },
-        { prop1: 'リン', prop2: 'りん' },
-        { prop1: '門番', prop2: 'もんばん' },
-        { prop1: '？？？', prop2: 'はてな' },
-      ],
-      // unitNameFilterItems: [
-      //   'マルス',
-      //   'シーダ',
-      //   'クロム',
-      //   'アルフォンス',
-      //   'リョウマ',
-      //   'シグレ',
-      //   'リン',
-      //   'チキ',
-      //   'ポー',
-      // ],
       // シンボルフィルター
       symbolFilter: undefined,
       symbolFilterItems: [
@@ -448,10 +434,10 @@ export default {
     addSymbolColorData(symbols, data) {
       switch (symbols[1]) {
         case '聖痕':
-          data.color = 'redblue'
+          data.color = 'red-blue'
           break
         case '暗夜':
-          data.color = 'whiteblack'
+          data.color = 'black-white'
           break
         default:
           switch (symbols[0]) {
@@ -516,10 +502,10 @@ export default {
     // ▲ 検索ドロワーに関するメソッド ****************************************▲
     filterObject(item, queryText, itemText) {
       return (
-        item.prop1
+        item.name.toLocaleLowerCase().includes(queryText.toLocaleLowerCase()) ||
+        item.hiragana
           .toLocaleLowerCase()
-          .includes(queryText.toLocaleLowerCase()) ||
-        item.prop2.toLocaleLowerCase().includes(queryText.toLocaleLowerCase())
+          .includes(queryText.toLocaleLowerCase())
       )
     },
   },
@@ -527,7 +513,7 @@ export default {
 </script>
 
 <style>
-.redblue {
+.red-blue {
   background: rgb(239, 154, 154);
   background: linear-gradient(
     90deg,
@@ -535,7 +521,7 @@ export default {
     rgba(187, 222, 251, 1) 70%
   );
 }
-.whiteblack {
+.black-white {
   background: rgb(245, 245, 245);
   background: linear-gradient(
     90deg,
