@@ -9,29 +9,25 @@
                     - cardId : String
                     - title : String
                     - unitName : String
-                    - symbol1 : String
-                    - symbol2 : String
+                    - symbols : Array[String]
                     - count : Number
                     - displayOrder : Number
                 - heroCard : Map
                   - cardId : String
                   - title : String
                   - unitName : String
-                  - symbol1 : String
-                  - symbol2 : String
+                  - symbols : Array[String]
                 - mainClassChangeCard : Map
                   - cardId : String
                   - title : String
                   - unitName : String
-                  - symbol1 : String
-                  - symbol2 : String 
+                  - symbols : Array[String]
                 - MarkCards : SubCollection
                   - DocumentId : Cards.DocumentId
                     - cardId : String
                     - title : String
                     - unitName : String
-                    - symbol1 : String
-                    - symbol2 : String
+                    - symbols : Array[String]
                     - count : Number
                     - displayOrder : Number
                 - isPublic : Boolean
@@ -61,20 +57,16 @@
       - unitName: String
       - sortie_cost: String
       - cc_cost: String
-      - symbol1: String
-      - symbol2: String
+      - symbols: Array[String]
       - gender:  String
       - weapon: String
-      - type1: String
-      - type2: String
-      - type3: String
-      - type4: String
-      - n_skill_name1: String
-      - n_skill_name2: String
-      - n_skill_name3: String
-      - n_skill_name4: String
-      - s_skill_name1: String
-      - s_skill_name2: String
+      - types : Array[String]
+      - n_skills : Array[Map]
+        - name : String
+        - text : String
+      - s_skills : Array[Map]
+        - name : String
+        - text : String
       - c_power: String
       - s_power: String
       - range: String
