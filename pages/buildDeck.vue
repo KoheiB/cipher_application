@@ -5,7 +5,8 @@
       v-model="drawer"
       app
       clipped
-      width="360"
+      width="90%"
+      style="max-width: 400px"
       mobile-breakpoint="500"
     >
       <!--▼ ユニット名フィルター ****************************************▼-->
