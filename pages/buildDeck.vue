@@ -114,7 +114,7 @@
               @infinite="filteredCardsInfiniteHandler"
             >
               <span slot="no-more">No More Cards</span>
-              <span slot="no-results">No Data</span>
+              <span slot="no-results">No More Cards</span>
             </infinite-loading>
           </v-list>
         </v-tab-item>
@@ -147,9 +147,25 @@
                   ></v-list-item-subtitle>
                   <v-list-item-title v-text="card.unitName"></v-list-item-title>
                 </v-list-item-content>
-                <v-list-item-action>
-                  <v-btn outlined @click.prevent="markCards.push(card)">
-                    <v-icon>mdi-delete</v-icon>
+                <v-list-item-action class="d-flex flex-column">
+                  <v-btn
+                    class="mb-1"
+                    outlined
+                    width="100%"
+                    small
+                    @click="myDeckCards.push(card)"
+                    >１枚追加</v-btn
+                  >
+                  <v-btn class="mb-1" outlined width="100%" small
+                    >４枚追加</v-btn
+                  >
+                  <v-btn
+                    outlined
+                    width="100%"
+                    small
+                    @click.prevent="markCards.push(card)"
+                  >
+                    <v-icon>mdi-delete</v-icon>削除
                   </v-btn>
                 </v-list-item-action>
               </v-list-item>
@@ -164,7 +180,7 @@
               @infinite="markCardsInfiniteHandler"
             >
               <span slot="no-more">No More Cards</span>
-              <span slot="no-results">No Data</span>
+              <span slot="no-results">No More Cards</span>
             </infinite-loading> -->
           </v-list>
         </v-tab-item>
