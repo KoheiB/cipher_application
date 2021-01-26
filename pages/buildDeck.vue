@@ -14,7 +14,6 @@
           v-model="unitNameFilter"
           :items="unitNameFilterItems"
           :filter="filterObject"
-          :search-input="unitNameFilter"
           item-text="name"
           label="ユニット名で検索"
           prepend-inner-icon="mdi-database-search"
@@ -64,7 +63,6 @@
                 :class="card.color"
                 class="pl-0"
                 three-line
-                @click="myDeckCards.push(card)"
               >
                 <v-list-item-avatar
                   class="ma-0 mr-2"
@@ -83,9 +81,25 @@
                   ></v-list-item-subtitle>
                   <v-list-item-title v-text="card.unitName"></v-list-item-title>
                 </v-list-item-content>
-                <v-list-item-action>
-                  <v-btn outlined @click.prevent="markCards.push(card)">
-                    <v-icon>mdi-bookmark</v-icon>
+                <v-list-item-action class="d-flex flex-column">
+                  <v-btn
+                    class="mb-1"
+                    outlined
+                    width="100%"
+                    small
+                    @click="myDeckCards.push(card)"
+                    >１枚追加</v-btn
+                  >
+                  <v-btn class="mb-1" outlined width="100%" small
+                    >４枚追加</v-btn
+                  >
+                  <v-btn
+                    outlined
+                    width="100%"
+                    small
+                    @click.prevent="markCards.push(card)"
+                  >
+                    <v-icon>mdi-bookmark</v-icon>キープ
                   </v-btn>
                 </v-list-item-action>
               </v-list-item>
@@ -115,7 +129,6 @@
                 :class="card.color"
                 class="pl-0"
                 three-line
-                @click="myDeckCards.push(card)"
               >
                 <v-list-item-avatar
                   class="ma-0 mr-2"
@@ -145,7 +158,7 @@
                 :key="index"
               ></v-divider>
             </template>
-            <!-- <infinite-loading
+            <!-- TODO<infinite-loading
               ref="markCardsInfiniteLoading"
               spinner="spiral"
               @infinite="markCardsInfiniteHandler"
@@ -508,6 +521,16 @@ export default {
           .includes(queryText.toLocaleLowerCase())
       )
     },
+    // TODOisMarked(card) {
+    //   const result = this.myDeckCards.filter((myDeckCard) => {
+    //     return card
+    //   })
+    //   if (result.length !== 0) {
+    //     return true
+    //   } else {
+    //     return false
+    //   }
+    // },
   },
 }
 </script>
@@ -517,16 +540,16 @@ export default {
   background: rgb(239, 154, 154);
   background: linear-gradient(
     90deg,
-    rgba(239, 154, 154, 1) 50%,
-    rgba(187, 222, 251, 1) 70%
+    rgba(239, 154, 154, 1) 40%,
+    rgba(187, 222, 251, 1) 60%
   );
 }
 .black-white {
   background: rgb(245, 245, 245);
   background: linear-gradient(
     90deg,
-    rgba(189, 189, 189, 1) 50%,
-    rgba(245, 245, 245, 1) 70%
+    rgba(189, 189, 189, 1) 40%,
+    rgba(245, 245, 245, 1) 60%
   );
 }
 </style>
