@@ -1,6 +1,6 @@
 <template>
   <v-bottom-navigation class="d-mobile-none">
-    <v-btn-toggle v-model="icon" borderless>
+    <v-btn-toggle borderless>
       <v-btn text nuxt to="buildDeck" class="text-capitalize">
         <v-icon> mdi-file-edit-outline </v-icon>
         <span>Build Deck</span>

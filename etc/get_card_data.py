@@ -72,10 +72,10 @@ def scraping(url):
             card_data.append(card_no[0:3])
 
             # title
-            card_data.append(card_name.rsplit(" ", 1)[0])
+            card_data.append(card_name.split(" ", 1)[0].strip())
 
             # name
-            card_data.append(card_name.rsplit(" ", 1)[1])
+            card_data.append(card_name.split(" ", 1)[1].strip())
 
             # sortie_cost
             card_data.append(
@@ -257,7 +257,7 @@ last_page_number = int(get_last_page_number(url))
 
 
 # スクレイピングしたデータを一括で書き込む
-with open('data/' + str(datetime.date.today()) + '02_cipher_data.csv', 'w', encoding="utf-8", newline="") as f:
+with open(str(datetime.date.today()) + '_cipher_data.csv', 'w', encoding="utf-8", newline="") as f:
     writer = csv.writer(f)
 
     # ヘッダーを書き込む
