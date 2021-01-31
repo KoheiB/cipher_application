@@ -1,7 +1,7 @@
 <template>
   <div class="card-wrapper">
-    <v-card class="ma-1">
-      <v-img :src="img"></v-img>
+    <v-card style="margin: 1px">
+      <v-img :src="img" />
     </v-card>
   </div>
 </template>
