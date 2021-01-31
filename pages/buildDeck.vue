@@ -203,6 +203,7 @@
         <div>
           <v-btn class="primary" width="100" @click="shareDeck">ツイート</v-btn>
           <v-btn class="info" width="100" @click="saveDeck">保存</v-btn>
+          <v-btn class="info" width="100" @click="loadDeck">ロード</v-btn>
           <v-btn @click="drawer = !drawer">ドロワー</v-btn>
         </div>
       </div>
@@ -269,6 +270,7 @@ export default {
       myDeckCards: [],
       markCards: [],
       filteredCards: [],
+      useCardsRef: '',
       // UIコンポーネント
       drawer: null,
       tab: null,
@@ -299,14 +301,17 @@ export default {
   },
   methods: {
     saveDeck() {
-      const useCardsRef = this.$firestore
-        .collection('Users')
-        .doc()
-        .collection('Decks')
-        .doc()
-        .collection('UseCards')
+      if (this.useCardsRef === '') {
+        console.log('ref')
+        this.useCardsRef = this.$firestore
+          .collection('Users')
+          .doc()
+          .collection('Decks')
+          .doc()
+          .collection('UseCards')
+      }
       this.myDeckCards.forEach((cardObject, index) => {
-        useCardsRef.doc().set(
+        this.useCardsRef.doc().set(
           {
             card: {
               id: cardObject.card.id,
@@ -322,6 +327,28 @@ export default {
         )
       })
       alert('saved')
+    },
+    async loadDeck() {
+      const snapshot = await this.useCardsRef
+        .orderBy('displayOrder', 'asc')
+        .get()
+      const data = snapshot.docs.map((snapshot) => {
+        const result = {
+          card: {
+            _id: snapshot.data().card.id,
+            image: snapshot.data().card.image,
+            symbols: snapshot.data().card.symbols,
+            title: snapshot.data().card.title,
+            unitName: snapshot.data().card.unitName,
+          },
+          count: snapshot.data().count,
+        }
+        console.log(result)
+        this.addSymbolColorData(snapshot.data().card.symbols, result)
+        return result
+      })
+      this.myDeckCards = data
+      alert('loaded')
     },
     shareDeck() {
       console.log('shared')
