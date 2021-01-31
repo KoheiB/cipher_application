@@ -299,7 +299,29 @@ export default {
   },
   methods: {
     saveDeck() {
-      console.log('saved')
+      const useCardsRef = this.$firestore
+        .collection('Users')
+        .doc()
+        .collection('Decks')
+        .doc()
+        .collection('UseCards')
+      this.myDeckCards.forEach((cardObject, index) => {
+        useCardsRef.doc().set(
+          {
+            card: {
+              id: cardObject.card.id,
+              title: cardObject.card.title,
+              unitName: cardObject.card.unitName,
+              symbols: cardObject.card.symbols,
+              image: cardObject.card.image,
+            },
+            count: cardObject.count,
+            displayOrder: index,
+          },
+          { merge: true }
+        )
+      })
+      alert('saved')
     },
     shareDeck() {
       console.log('shared')
