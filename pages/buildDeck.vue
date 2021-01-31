@@ -659,7 +659,7 @@ export default {
       card.count--
       const i = this.myDeckCards.indexOf(card)
       if (card.count === 0) {
-        this.myDeckCards.splice(i)
+        this.myDeckCards.splice(i, 1)
       }
     },
   },
