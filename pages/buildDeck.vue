@@ -88,7 +88,7 @@
                     outlined
                     width="100%"
                     small
-                    @click="myDeckCards.push(card)"
+                    @click="addCard(card)"
                     >１枚追加</v-btn
                   >
                   <v-btn class="mb-1" outlined width="100%" small
@@ -219,9 +219,35 @@
       <PickedCard
         v-for="(card, index) in myDeckCards"
         :key="index"
-        :img="card.image"
+        class="hidden-mobile-and-down"
+        :img="card.card.image"
       ></PickedCard>
     </draggable>
+    <v-list>
+      <draggable
+        v-model="myDeckCards"
+        class=""
+        group="myDeckCardList"
+        :animation="200"
+        @start="drag = true"
+        @end="drag = false"
+        @change="onMoveCard"
+      >
+        <PickedCardList
+          v-for="(card, index) in myDeckCards"
+          :key="2 + index"
+          class="d-mobile-none"
+          :img="card.card.image"
+          :unit-name="card.card.unitName"
+          :title="card.card.title"
+          :count="card.count"
+          :symbols="card.card.symbols"
+          :color="card.color"
+          @click="remove(card)"
+        >
+        </PickedCardList>
+      </draggable>
+    </v-list>
     {{ myDeckCards }}
   </v-container>
   <!--▲ メイン画面 ****************************************▲-->
@@ -265,6 +291,11 @@ export default {
         '女神紋',
       ],
     }
+  },
+  computed: {
+    myDeckCardView() {
+      return this.myDeckCards
+    },
   },
   methods: {
     saveDeck() {
@@ -532,10 +563,12 @@ export default {
     // ▲ 検索ドロワーに関するメソッド ****************************************▲
     filterObject(item, queryText, itemText) {
       return (
-        item.name.toLocaleLowerCase().includes(queryText.toLocaleLowerCase()) ||
+        item.name
+          .toLocaleLowerCase()
+          .startsWith(queryText.toLocaleLowerCase()) ||
         item.hiragana
           .toLocaleLowerCase()
-          .includes(queryText.toLocaleLowerCase())
+          .startsWith(queryText.toLocaleLowerCase())
       )
     },
     // TODOisMarked(card) {
@@ -548,6 +581,34 @@ export default {
     //     return false
     //   }
     // },
+    addCard(card) {
+      const newId = card._id.replace('+', 'plus')
+      const imageUrl = '/img/' + card.recording + '/' + newId + '.png'
+      const result = {
+        card: {
+          id: card._id,
+          title: card.title,
+          unitName: card.unitName,
+          symbols: card.symbols,
+          image: imageUrl,
+        },
+        count: 1,
+      }
+      this.addSymbolColorData(card.symbols, result)
+
+      const cardExists = this.myDeckCards.filter((useCard) => {
+        return useCard.card.id === result.card.id
+      })
+      if (cardExists.length === 0) {
+        this.myDeckCards.push(result)
+      } else {
+        const i = this.myDeckCards.indexOf(cardExists[0])
+        this.myDeckCards[i].count++
+      }
+    },
+    removeCard(card) {
+      card.count--
+    },
   },
 }
 </script>
