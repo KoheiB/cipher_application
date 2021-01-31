@@ -218,10 +218,10 @@
       @change="onMoveCard"
     >
       <PickedCard
-        v-for="(card, index) in myDeckCards"
+        v-for="(card, index) in myDeckCardView"
         :key="index"
         class="hidden-mobile-and-down"
-        :img="card.card.image"
+        :img="card.image"
       ></PickedCard>
     </draggable>
     <v-list>
@@ -250,6 +250,7 @@
       </draggable>
     </v-list>
     {{ myDeckCards }}
+    {{ myDeckCardView }}
   </v-container>
   <!--▲ メイン画面 ****************************************▲-->
 </template>
@@ -296,7 +297,17 @@ export default {
   },
   computed: {
     myDeckCardView() {
-      return this.myDeckCards
+      const result = []
+      this.myDeckCards.forEach((cardObject) => {
+        const card = {
+          id: cardObject.card.id,
+          image: cardObject.card.image,
+        }
+        for (let i = 0; i < cardObject.count; i++) {
+          result.push(card)
+        }
+      })
+      return result
     },
   },
   methods: {
