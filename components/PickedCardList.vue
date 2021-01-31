@@ -1,6 +1,11 @@
 <template>
-  <v-list-item class="mb-1 px-0 mr-8 ml-2 red" :class="color" @click="onclick">
-    <v-list-item-avatar class="ma-0 mr-2" tile height="49" width="72">
+  <v-list-item
+    class="px-0 mr-8 ml-2"
+    :class="color"
+    style="margin-bottom: 1px"
+    @click="onClick"
+  >
+    <v-list-item-avatar class="ma-0 mr-2" tile height="48" width="72">
       <v-img :src="img" position="top" />
     </v-list-item-avatar>
     <v-list-item-content class="card-info py-0 d-flex flex-nowrap">
@@ -15,7 +20,7 @@
         <v-col
           cols="2"
           class="px-0 py-4 blue-grey darken-4 white--text font-weight-bold text-center"
-          style="height: 49px"
+          style="height: 48px"
         >
           {{ count }}
         </v-col>
@@ -53,8 +58,8 @@ export default {
     },
   },
   methods: {
-    onclick() {
-      console.log('click')
+    onClick() {
+      this.$emit('on-click')
     },
   },
 }
