@@ -10,7 +10,7 @@
       mobile-breakpoint="500"
     >
       <!--▼ ユニット名フィルター ****************************************▼-->
-      <v-container class="pb-0 mt-4">
+      <v-container class="pb-0 pt-4" style="height: 10vh">
         <v-autocomplete
           v-model="unitNameFilter"
           :items="unitNameFilterItems"
@@ -29,7 +29,7 @@
       <!--▲ ユニット名フィルター ****************************************▲-->
 
       <!--▼ シンボルフィルター ****************************************▼-->
-      <v-container class="py-0">
+      <v-container class="pb-0 pt-4" style="height: 10vh">
         <v-select
           v-model="symbolFilter"
           :items="symbolFilterItems"
@@ -57,7 +57,7 @@
       <v-tabs-items v-model="tab">
         <!--▼ タブ内容1:Search ****************************************▼-->
         <v-tab-item>
-          <v-list class="py-0 overflow-y-auto" height="450" outlined>
+          <v-list class="py-0 overflow-y-auto" height="65vh" outlined>
             <template v-for="(card, index) in filteredCards">
               <v-list-item
                 :key="'search-' + card._id"
@@ -91,7 +91,12 @@
                     @click="addCard(card)"
                     >１枚追加</v-btn
                   >
-                  <v-btn class="mb-1" outlined width="100%" small
+                  <v-btn
+                    class="mb-1"
+                    outlined
+                    width="100%"
+                    small
+                    @click="addFourCards(card)"
                     >４枚追加</v-btn
                   >
                   <v-btn
@@ -664,6 +669,11 @@ export default {
       } else {
         const i = this.myDeckCards.indexOf(cardExists[0])
         this.myDeckCards[i].count++
+      }
+    },
+    addFourCards(card) {
+      for (let i = 0; i < 4; i++) {
+        this.addCard(card)
       }
     },
     onClick(card) {
