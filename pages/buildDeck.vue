@@ -17,7 +17,7 @@
           :filter="filterObject"
           item-text="name"
           label="ユニット名で検索"
-          prepend-inner-icon="mdi-database-search"
+          prepend-inner-icon="mdi-human-handsdown"
           autofocus
           dense
           clearable
@@ -277,15 +277,19 @@ export default {
       markCards: [],
       filteredCards: [],
       useCardsRef: '',
-      // UIコンポーネント
+
+      // UIコンポーネント関連
       drawer: null,
       tab: null,
-      // ページネーション
+
+      // ページネーション関連
       nextFilteredCards: null,
       lastFilteredCard: null,
-      // ユニット名フィルター
+
+      // ユニット名フィルター関連
       unitNameFilter: undefined,
-      // シンボルフィルター
+
+      // シンボルフィルター関連
       symbolFilter: undefined,
       symbolFilterItems: [
         'なし',
@@ -438,7 +442,6 @@ export default {
       await this.displayCards()
       await this.$refs.filteredCardsInfiniteLoading.stateChanger.reset()
     },
-    // フィルターをリセット
     resetFilter() {
       this.filteredCards = []
       this.nextFilteredCards = null
@@ -618,7 +621,7 @@ export default {
         await this.setLastFilteredCard()
         await this.displayCards()
         // 取得したカードが10未満ならスクロール終了
-        if (this.nextFilteredCards.size <= 9) {
+        if (this.nextFilteredCards.size < 10) {
           $state.complete()
         } else {
           $state.loaded()
