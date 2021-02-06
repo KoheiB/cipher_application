@@ -196,22 +196,22 @@
     <!--▲ 検索ドロワー ****************************************▲-->
 
     <!--▼ メイン画面 ****************************************▼-->
-    <v-container class="d-flex justify-space-between">
-      <v-form
-        v-model="myDeckName"
-        class="w-20 d-flex align-center"
-        @submit.prevent
-      >
-        <v-text-field type="text" label="myDeckName"></v-text-field>
+    <v-container class="">
+      <v-form class="w-20 d-flex align-center" @submit.prevent>
+        <v-text-field
+          v-model="myDeckName"
+          type="text"
+          label="myDeckName"
+        ></v-text-field>
       </v-form>
-      <div class="d-flex align-center">
-        <div>
-          <v-btn class="primary" width="100" @click="shareDeck">ツイート</v-btn>
-          <v-btn class="info" width="100" @click="saveDeck">保存</v-btn>
-          <v-btn class="info" width="100" @click="loadDeck">ロード</v-btn>
-          <v-btn @click="drawer = !drawer">ドロワー</v-btn>
-        </div>
-      </div>
+      <v-layout class="d-flex align-center">
+        <v-btn class="primary" width="25%" tile @click="shareDeck"
+          >ツイート</v-btn
+        >
+        <v-btn class="info" width="25%" tile @click="saveDeck">保存</v-btn>
+        <v-btn class="info" width="25%" tile @click="loadDeck">ロード</v-btn>
+        <v-btn width="25%" tile @click="drawer = !drawer">ドロワー</v-btn>
+      </v-layout>
     </v-container>
     <draggable
       v-model="myDeckCards"
