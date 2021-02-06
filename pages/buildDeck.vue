@@ -17,7 +17,7 @@
           :filter="filterObject"
           item-text="name"
           label="ユニット名で検索"
-          prepend-inner-icon="mdi-database-search"
+          prepend-inner-icon="mdi-human-handsdown"
           autofocus
           dense
           clearable
@@ -243,15 +243,19 @@ export default {
       myDeckCards: [],
       markCards: [],
       filteredCards: [],
-      // UIコンポーネント
+
+      // UIコンポーネント関連
       drawer: null,
       tab: null,
-      // ページネーション
+
+      // ページネーション関連
       nextFilteredCards: null,
       lastFilteredCard: null,
-      // ユニット名フィルター
+
+      // ユニット名フィルター関連
       unitNameFilter: undefined,
-      // シンボルフィルター
+
+      // シンボルフィルター関連
       symbolFilter: undefined,
       symbolFilterItems: [
         'なし',
@@ -342,7 +346,6 @@ export default {
       await this.displayCards()
       await this.$refs.filteredCardsInfiniteLoading.stateChanger.reset()
     },
-    // フィルターをリセット
     resetFilter() {
       this.filteredCards = []
       this.nextFilteredCards = null
@@ -522,7 +525,7 @@ export default {
         await this.setLastFilteredCard()
         await this.displayCards()
         // 取得したカードが10未満ならスクロール終了
-        if (this.nextFilteredCards.size <= 9) {
+        if (this.nextFilteredCards.size < 10) {
           $state.complete()
         } else {
           $state.loaded()
@@ -532,10 +535,12 @@ export default {
     // ▲ 検索ドロワーに関するメソッド ****************************************▲
     filterObject(item, queryText, itemText) {
       return (
-        item.name.toLocaleLowerCase().includes(queryText.toLocaleLowerCase()) ||
+        item.name
+          .toLocaleLowerCase()
+          .startsWith(queryText.toLocaleLowerCase()) ||
         item.hiragana
           .toLocaleLowerCase()
-          .includes(queryText.toLocaleLowerCase())
+          .startsWith(queryText.toLocaleLowerCase())
       )
     },
     // TODOisMarked(card) {
