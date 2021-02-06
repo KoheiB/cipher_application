@@ -22,7 +22,7 @@
           class="px-0 py-4 blue-grey darken-4 white--text font-weight-bold text-center"
           style="height: 48px"
         >
-          {{ count }}
+          <span style="font-size: 16px; margin-right: 2px">x</span>{{ count }}
         </v-col>
       </v-row>
     </v-list-item-content>
