@@ -72,7 +72,7 @@
                   size="88"
                   height="100%"
                 >
-                  <v-img :src="card.image" />
+                  <v-img :src="card.imageUrl" />
                 </v-list-item-avatar>
                 <v-list-item-content>
                   <v-list-item-subtitle
@@ -143,7 +143,7 @@
                   size="88"
                   height="100%"
                 >
-                  <v-img :src="card.image" />
+                  <v-img :src="card.imageUrl" />
                 </v-list-item-avatar>
                 <v-list-item-content>
                   <v-list-item-subtitle
@@ -227,7 +227,7 @@
         v-for="(card, index) in myDeckCardView"
         :key="index"
         class="hidden-mobile-and-down"
-        :img="card.image"
+        :img="card.imageUrl"
       ></PickedCard>
     </draggable>
     <v-list>
@@ -244,7 +244,7 @@
           v-for="(card, index) in myDeckCards"
           :key="2 + index"
           class="d-mobile-none"
-          :img="card.card.image"
+          :img="card.card.imageUrl"
           :unit-name="card.card.unitName"
           :title="card.card.title"
           :count="card.count"
@@ -316,7 +316,7 @@ export default {
       this.myDeckCards.forEach((cardObject) => {
         const card = {
           id: cardObject.card.id,
-          image: cardObject.card.image,
+          imageUrl: cardObject.card.imageUrl,
         }
         for (let i = 0; i < cardObject.count; i++) {
           result.push(card)
@@ -344,7 +344,7 @@ export default {
               title: cardObject.card.title,
               unitName: cardObject.card.unitName,
               symbols: cardObject.card.symbols,
-              image: cardObject.card.image,
+              imageUrl: cardObject.card.imageUrl,
             },
             count: cardObject.count,
             displayOrder: index,
@@ -362,7 +362,7 @@ export default {
         const result = {
           card: {
             _id: snapshot.data().card.id,
-            image: snapshot.data().card.image,
+            imageUrl: snapshot.data().card.imageUrl,
             symbols: snapshot.data().card.symbols,
             title: snapshot.data().card.title,
             unitName: snapshot.data().card.unitName,
@@ -558,9 +558,7 @@ export default {
         return docData
       })
       result.forEach((card) => {
-        const newId = card._id.replace('+', 'plus')
-        const imageUrl = '/img/' + card.recording + '/' + newId + '.png'
-        card.image = imageUrl
+        card.imageUrl = this.getImageUrl(card)
         this.filteredCards.push(card)
       })
       return result
@@ -662,7 +660,7 @@ export default {
           title: card.title,
           unitName: card.unitName,
           symbols: card.symbols,
-          image: this.getImageUrl(card),
+          imageUrl: this.getImageUrl(card),
         },
         count: 1,
       }
@@ -712,7 +710,7 @@ export default {
   );
 }
 /* .gradient {
-  background-image: linear-gradient(
+  background-imageUrl: linear-gradient(
     90deg,
     rgb(109, 213, 208) 30%,
     rgba(109, 213, 208, 0) 70%

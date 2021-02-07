@@ -6,7 +6,7 @@
     @click="onClick"
   >
     <v-list-item-avatar class="ma-0 mr-2" tile height="48" width="72">
-      <v-img :src="img" position="top" />
+      <v-img :src="imageUrl" position="top" />
     </v-list-item-avatar>
     <v-list-item-content class="card-info py-0 d-flex flex-nowrap">
       <v-row class="mx-0">
@@ -32,7 +32,7 @@
 <script>
 export default {
   props: {
-    img: {
+    imageUrl: {
       type: String,
       required: true,
     },
