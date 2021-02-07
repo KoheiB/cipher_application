@@ -28,23 +28,32 @@
       </v-container>
       <!--▲ ユニット名フィルター ****************************************▲-->
 
-      <!--▼ シンボルフィルター ****************************************▼-->
-      <v-container class="pb-0 pt-4" style="height: 10vh">
+      <!--▼ シンボル/出撃コストフィルター ****************************************▼-->
+      <v-container class="pb-0 pt-4 d-flex" style="height: 10vh">
         <v-select
           v-model="symbolFilter"
           :items="symbolFilterItems"
-          label="シンボルで絞り込み"
-          prepend-inner-icon="mdi-filter"
+          style="width: 60%; padding-right: 1px"
+          label="シンボル"
           dense
           clearable
           outlined
           @change="searchCards()"
-        ></v-select>
+        />
+        <v-select
+          v-model="sortieCostFilter"
+          :items="sortieCostFilterItems"
+          style="width: 40%; padding-left: 1px"
+          label="出撃コスト"
+          dense
+          clearable
+          outlined
+        />
       </v-container>
       <!--▲ シンボルフィルター ****************************************▲-->
 
       <!--▼ タブ選択画面 ****************************************▼-->
-      <v-tabs v-model="tab" grow>
+      <v-tabs v-model="tab" grow height="5vh">
         <v-tab style="max-width: 50%"
           ><v-icon class="pr-1">mdi-cards</v-icon>Search</v-tab
         >
@@ -57,7 +66,7 @@
       <v-tabs-items v-model="tab">
         <!--▼ タブ内容1:Search ****************************************▼-->
         <v-tab-item>
-          <v-list class="py-0 overflow-y-auto" height="65vh" outlined>
+          <v-list class="py-0 overflow-y-auto" height="75vh" outlined>
             <template v-for="(card, index) in filteredCards">
               <v-list-item
                 :key="'search-' + card._id"
@@ -305,6 +314,10 @@ export default {
         '聖戦旗',
         '女神紋',
       ],
+
+      // 出撃コストフィルター関連
+      sortieCostFilter: undefined,
+      sortieCostFilterItems: ['0', '1', '2', '3', '4', '5', '6', '7', 'X'],
     }
   },
   computed: {
@@ -458,6 +471,9 @@ export default {
       }
       if (this.symbolFilter) {
         result = result.where('symbols', 'array-contains', this.symbolFilter)
+      }
+      if (this.sortieCostFilter) {
+        result = result.where('sortie_cost', '==', this.sortieCostFilter)
       }
       if (this.lastFilteredCard) {
         result = result.startAfter(this.lastFilteredCard)
