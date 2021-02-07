@@ -269,12 +269,13 @@ import draggable from 'vuedraggable'
 import InfiniteLoading from 'vue-infinite-loading'
 import unitNameFilterItems from '../mixins/UnitNameFilterItems'
 import symbolItems from '../mixins/SymbolItems'
+import getImageUrl from '../mixins/GetImageUrl'
 export default {
   components: {
     draggable,
     InfiniteLoading,
   },
-  mixins: [unitNameFilterItems, symbolItems],
+  mixins: [unitNameFilterItems, symbolItems, getImageUrl],
   data() {
     return {
       myDeckName: '',
@@ -655,15 +656,13 @@ export default {
     //   }
     // },
     addCard(card) {
-      const newId = card._id.replace('+', 'plus')
-      const imageUrl = '/img/' + card.recording + '/' + newId + '.png'
       const result = {
         card: {
           id: card._id,
           title: card.title,
           unitName: card.unitName,
           symbols: card.symbols,
-          image: imageUrl,
+          image: this.getImageUrl(card),
         },
         count: 1,
       }
