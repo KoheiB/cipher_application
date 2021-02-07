@@ -50,7 +50,7 @@
           ><v-icon class="pr-1">mdi-cards</v-icon>Search</v-tab
         >
         <v-tab style="max-width: 50%"
-          ><v-icon class="pr-1">mdi-bookmark-multiple</v-icon>Bookmark</v-tab
+          ><v-icon class="pr-1">mdi-bookkeep-multiple</v-icon>Keep</v-tab
         >
       </v-tabs>
       <!--▲ タブ選択画面 ****************************************▲-->
@@ -61,7 +61,7 @@
           <v-list class="py-0 overflow-y-auto" height="65vh" outlined>
             <template v-for="(card, index) in filteredCards">
               <v-list-item
-                :key="'search-' + card._id"
+                :key="'search-' + card.id"
                 :class="card.color"
                 class="pl-0"
                 three-line
@@ -75,9 +75,7 @@
                   <v-img :src="card.imageUrl" />
                 </v-list-item-avatar>
                 <v-list-item-content>
-                  <v-list-item-subtitle
-                    v-text="card._id"
-                  ></v-list-item-subtitle>
+                  <v-list-item-subtitle v-text="card.id"></v-list-item-subtitle>
                   <v-list-item-subtitle
                     v-text="card.title"
                   ></v-list-item-subtitle>
@@ -104,7 +102,7 @@
                     outlined
                     width="100%"
                     small
-                    @click.prevent="markCards.push(card)"
+                    @click.prevent="keepCards.push(card)"
                   >
                     <v-icon>mdi-bookmark</v-icon>キープ
                   </v-btn>
@@ -127,12 +125,12 @@
         </v-tab-item>
         <!--▲ タブ内容1:Search ****************************************▲-->
 
-        <!--TODO▼ タブ内容2:Bookmark ****************************************▼-->
+        <!--TODO▼ タブ内容2:Keep ****************************************▼-->
         <v-tab-item>
           <v-list class="py-0 overflow-y-auto" height="450" outlined>
-            <template v-for="(card, index) in markCards">
+            <template v-for="(card, index) in keepCards">
               <v-list-item
-                :key="'mark-' + card._id"
+                :key="'keep-' + card.id"
                 :class="card.color"
                 class="pl-0"
                 three-line
@@ -146,9 +144,7 @@
                   <v-img :src="card.imageUrl" />
                 </v-list-item-avatar>
                 <v-list-item-content>
-                  <v-list-item-subtitle
-                    v-text="card._id"
-                  ></v-list-item-subtitle>
+                  <v-list-item-subtitle v-text="card.id"></v-list-item-subtitle>
                   <v-list-item-subtitle
                     v-text="card.title"
                   ></v-list-item-subtitle>
@@ -170,7 +166,7 @@
                     outlined
                     width="100%"
                     small
-                    @click.prevent="markCards.push(card)"
+                    @click.prevent="keepCards.push(card)"
                   >
                     <v-icon>mdi-delete</v-icon>削除
                   </v-btn>
@@ -182,16 +178,16 @@
               ></v-divider>
             </template>
             <!-- TODO<infinite-loading
-              ref="markCardsInfiniteLoading"
+              ref="keepCardsInfiniteLoading"
               spinner="spiral"
-              @infinite="markCardsInfiniteHandler"
+              @infinite="keepCardsInfiniteHandler"
             >
               <span slot="no-more">No More Cards</span>
               <span slot="no-results">No More Cards</span>
             </infinite-loading> -->
           </v-list>
         </v-tab-item>
-        <!--▲ タブ内容2:Bookmark ****************************************▲-->
+        <!--▲ タブ内容2:Keep ****************************************▲-->
       </v-tabs-items>
     </v-navigation-drawer>
     <!--▲ 検索ドロワー ****************************************▲-->
@@ -288,7 +284,7 @@ export default {
     return {
       myDeckName: '',
       myDeckCards: [],
-      markCards: [],
+      keepCards: [],
       filteredCards: [],
       useCardsRef: '',
 
@@ -312,8 +308,8 @@ export default {
       const result = []
       this.myDeckCards.forEach((cardObject) => {
         const card = {
-          id: cardObject.card.id,
-          imageUrl: cardObject.card.imageUrl,
+          id: cardObject.info.id,
+          imageUrl: cardObject.info.imageUrl,
         }
         for (let i = 0; i < cardObject.count; i++) {
           result.push(card)
@@ -334,14 +330,15 @@ export default {
           .collection('UseCards')
       }
       this.myDeckCards.forEach((cardObject, index) => {
+        const card = cardObject.info
         this.useCardsRef.doc().set(
           {
-            card: {
-              id: cardObject.card.id,
-              title: cardObject.card.title,
-              unitName: cardObject.card.unitName,
-              symbols: cardObject.card.symbols,
-              imageUrl: cardObject.card.imageUrl,
+            info: {
+              id: card.id,
+              title: card.title,
+              unitName: card.unitName,
+              symbols: card.symbols,
+              imageUrl: card.imageUrl,
             },
             count: cardObject.count,
             displayOrder: index,
@@ -356,15 +353,14 @@ export default {
         .orderBy('displayOrder', 'asc')
         .get()
       const data = snapshot.docs.map((snapshot) => {
+        const card = snapshot.data().info
         const result = {
-          card: {
-            _id: snapshot.data().card.id,
-            imageUrl: snapshot.data().card.imageUrl,
-            symbols: snapshot.data().card.symbols,
-            color: this.getSymbolColor(snapshot.data().card),
-            gradation: this.getSymbolGradation(snapshot.data().card),
-            title: snapshot.data().card.title,
-            unitName: snapshot.data().card.unitName,
+          info: {
+            id: card.id,
+            imageUrl: card.imageUrl,
+            symbols: card.symbols,
+            title: card.title,
+            unitName: card.unitName,
           },
           count: snapshot.data().count,
         }
@@ -590,7 +586,7 @@ export default {
       }, 100)
     },
     // TODOマーク無限スクロール
-    markCardsInfiniteHandler($state) {
+    keepCardsInfiniteHandler($state) {
       setTimeout(async () => {
         await this.getFilteredCardsSnapshot()
         await this.setLastFilteredCard()
@@ -626,8 +622,8 @@ export default {
     // },
     addCard(card) {
       const result = {
-        card: {
-          id: card._id,
+        info: {
+          id: card.id,
           title: card.title,
           unitName: card.unitName,
           symbols: card.symbols,
@@ -639,7 +635,7 @@ export default {
       }
 
       const cardExists = this.myDeckCards.filter((useCard) => {
-        return useCard.card.id === result.card.id
+        return useCard.info.id === result.info.id
       })
       if (cardExists.length === 0) {
         this.myDeckCards.push(result)
