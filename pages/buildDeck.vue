@@ -256,6 +256,9 @@
     </v-list>
     {{ myDeckCards }}
     {{ myDeckCardView }}
+    <!-- <v-img :src="require('@/static/img/B01/B01-001SR.png')">
+      <div class="fill-height gradient"></div>
+    </v-img> -->
   </v-container>
   <!--▲ メイン画面 ****************************************▲-->
 </template>
@@ -707,4 +710,11 @@ export default {
     rgba(245, 245, 245, 1) 60%
   );
 }
+/* .gradient {
+  background-image: linear-gradient(
+    90deg,
+    rgb(109, 213, 208) 30%,
+    rgba(109, 213, 208, 0) 70%
+  );
+} */
 </style>
