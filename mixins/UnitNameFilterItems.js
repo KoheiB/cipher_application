@@ -329,7 +329,7 @@ const _unitNameFilterItems = [
   { name: 'ツィリル', hiragana: 'つぃりる' },
   { name: 'ツクヨミ', hiragana: 'つくよみ' },
   { name: 'ツバキ', hiragana: 'つばき' },
-  { name: '織部', hiragana: 'つばさ' },
+  { name: '織部 つばさ', hiragana: 'おりべ つばさ' },
   { name: '剣 弥代', hiragana: 'つるぎ やしろ' },
   { name: 'ディアドラ', hiragana: 'でぃあどら' },
   { name: 'ティアマト', hiragana: 'てぃあまと' },

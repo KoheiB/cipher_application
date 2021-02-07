@@ -1,5 +1,5 @@
 <template>
-  <v-bottom-navigation class="d-mobile-none">
+  <v-bottom-navigation class="d-mobile-none" fixed>
     <v-btn-toggle borderless>
       <v-btn text nuxt to="buildDeck" class="text-capitalize">
         <v-icon> mdi-file-edit-outline </v-icon>

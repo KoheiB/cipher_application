@@ -119,8 +119,8 @@
               spinner="spiral"
               @infinite="filteredCardsInfiniteHandler"
             >
-              <span slot="no-more">No More Cards</span>
-              <span slot="no-results">No More Cards</span>
+              <span slot="no-more"></span>
+              <span slot="no-results"></span>
             </infinite-loading>
           </v-list>
         </v-tab-item>
