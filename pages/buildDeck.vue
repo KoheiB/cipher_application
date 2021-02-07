@@ -32,7 +32,8 @@
       <v-container class="pb-0 pt-4" style="height: 10vh">
         <v-select
           v-model="symbolFilter"
-          :items="symbolFilterItems"
+          :items="symbolItems"
+          item-text="name"
           label="シンボルで絞り込み"
           prepend-inner-icon="mdi-filter"
           dense
@@ -197,7 +198,7 @@
 
     <!--▼ メイン画面 ****************************************▼-->
     <v-container class="">
-      <v-form class="w-20 d-flex align-center" @submit.prevent>
+      <v-form @submit.prevent>
         <v-text-field
           v-model="myDeckName"
           type="text"
@@ -267,12 +268,13 @@
 import draggable from 'vuedraggable'
 import InfiniteLoading from 'vue-infinite-loading'
 import unitNameFilterItems from '../mixins/UnitNameFilterItems'
+import symbolItems from '../mixins/SymbolItems'
 export default {
   components: {
     draggable,
     InfiniteLoading,
   },
-  mixins: [unitNameFilterItems],
+  mixins: [unitNameFilterItems, symbolItems],
   data() {
     return {
       myDeckName: '',
@@ -294,17 +296,17 @@ export default {
 
       // シンボルフィルター関連
       symbolFilter: undefined,
-      symbolFilterItems: [
-        'なし',
-        '光の剣',
-        '聖痕',
-        '白夜',
-        '暗夜',
-        'メダリオン',
-        '神器',
-        '聖戦旗',
-        '女神紋',
-      ],
+      // symbolItems: [
+      //   'なし',
+      //   '光の剣',
+      //   '聖痕',
+      //   '白夜',
+      //   '暗夜',
+      //   'メダリオン',
+      //   '神器',
+      //   '聖戦旗',
+      //   '女神紋',
+      // ],
     }
   },
   computed: {
