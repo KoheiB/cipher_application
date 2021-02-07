@@ -22,10 +22,28 @@ const _symbolItems = [
   { name: '女神紋', color: 'brown lighten-3', gradation: 'brown-gradation' },
 ]
 
+const _getSymbolColor = function (card) {
+  const symbolItem = this.symbolItems.filter((item) => {
+    return item.name === card.symbols[0]
+  })
+  return symbolItem[0].color
+}
+
+const _getSymbolGradation = function (card) {
+  const symbolItem = this.symbolItems.filter((item) => {
+    return item.name === card.symbols[0]
+  })
+  return symbolItem[0].gradation
+}
+
 export default {
   data() {
     return {
       symbolItems: _symbolItems,
     }
+  },
+  methods: {
+    getSymbolColor: _getSymbolColor,
+    getSymbolGradation: _getSymbolGradation,
   },
 }

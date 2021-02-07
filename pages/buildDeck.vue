@@ -268,14 +268,22 @@
 import draggable from 'vuedraggable'
 import InfiniteLoading from 'vue-infinite-loading'
 import unitNameFilterItems from '../mixins/UnitNameFilterItems'
-import symbolItems from '../mixins/SymbolItems'
+import symbolItems from '../mixins/Symbols'
+import getSymbolColor from '../mixins/Symbols'
+import getSymbolGradation from '../mixins/Symbols'
 import getImageUrl from '../mixins/GetImageUrl'
 export default {
   components: {
     draggable,
     InfiniteLoading,
   },
-  mixins: [unitNameFilterItems, symbolItems, getImageUrl],
+  mixins: [
+    unitNameFilterItems,
+    symbolItems,
+    getSymbolColor,
+    getSymbolGradation,
+    getImageUrl,
+  ],
   data() {
     return {
       myDeckName: '',
@@ -297,17 +305,6 @@ export default {
 
       // シンボルフィルター関連
       symbolFilter: undefined,
-      // symbolItems: [
-      //   'なし',
-      //   '光の剣',
-      //   '聖痕',
-      //   '白夜',
-      //   '暗夜',
-      //   'メダリオン',
-      //   '神器',
-      //   '聖戦旗',
-      //   '女神紋',
-      // ],
     }
   },
   computed: {
@@ -364,13 +361,14 @@ export default {
             _id: snapshot.data().card.id,
             imageUrl: snapshot.data().card.imageUrl,
             symbols: snapshot.data().card.symbols,
+            color: this.getSymbolColor(snapshot.data().card),
+            gradation: this.getSymbolGradation(snapshot.data().card),
             title: snapshot.data().card.title,
             unitName: snapshot.data().card.unitName,
           },
           count: snapshot.data().count,
         }
         console.log(result)
-        this.addSymbolColorData(snapshot.data().card.symbols, result)
         return result
       })
       this.myDeckCards = data
@@ -553,15 +551,13 @@ export default {
     // 取得した次に表示するカードのスナップショットのデータをクライアントサイドジョインののちに表示
     displayCards() {
       const result = this.nextFilteredCards.docs.map((doc) => {
-        const docData = doc.data()
-        const symbolItem = this.symbolItems.filter((item) => {
-          return item.name === docData.symbols[0]
-        })
-        docData.color = symbolItem[0].color
-        if (this.checkDoubleSymbol(docData.symbols, docData)) {
-          docData.color = this.checkDoubleSymbol(docData.symbols, docData)
+        const card = doc.data()
+        card.color = this.getSymbolColor(card)
+        card.gradaton = this.getSymbolGradation(card)
+        if (this.checkDoubleSymbol(card.symbols, card)) {
+          card.color = this.checkDoubleSymbol(card.symbols, card)
         }
-        return docData
+        return card
       })
       result.forEach((card) => {
         card.imageUrl = this.getImageUrl(card)
@@ -635,11 +631,12 @@ export default {
           title: card.title,
           unitName: card.unitName,
           symbols: card.symbols,
+          color: this.getSymbolColor(card),
+          gradation: this.getSymbolGradation(card),
           imageUrl: this.getImageUrl(card),
         },
         count: 1,
       }
-      this.addSymbolColorData(card.symbols, result)
 
       const cardExists = this.myDeckCards.filter((useCard) => {
         return useCard.card.id === result.card.id
