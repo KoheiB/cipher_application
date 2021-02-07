@@ -22,7 +22,7 @@
           dense
           clearable
           outlined
-          @change="changeFilter()"
+          @change="searchCards()"
         >
         </v-autocomplete>
       </v-container>
@@ -38,7 +38,7 @@
           dense
           clearable
           outlined
-          @change="changeFilter()"
+          @change="searchCards()"
         ></v-select>
       </v-container>
       <!--▲ シンボルフィルター ****************************************▲-->
@@ -438,7 +438,7 @@ export default {
 
     // ▼ 検索ドロワーに関するメソッド ****************************************▼
     // フィルターを変更した時の処理
-    async changeFilter() {
+    async searchCards() {
       await this.resetFilter()
       await this.getFilteredCardsSnapshot()
       await this.setLastFilteredCard()
@@ -452,94 +452,18 @@ export default {
     },
     // フィルターのパターンによって異なるスナップショットを取得
     async getFilteredCardsSnapshot() {
-      switch (this.unitNameFilter) {
-        case undefined:
-          switch (this.symbolFilter) {
-            // ユニット名:false、シンボル:false
-            case undefined:
-              await this.getNoFilteredCardsSnapshot()
-              break
-            // ユニット名:false、シンボル:true
-            default:
-              await this.getSymbolFilteredCardsSnapshot()
-          }
-          break
-        default:
-          switch (this.symbolFilter) {
-            // ユニット名:true、シンボル:false
-            case undefined:
-              await this.getUnitNameFilteredCardsSnapshot()
-              break
-            // ユニット名:true、シンボル:true
-            default:
-              await this.getUnitNameAndSymbolFilteredCardsSnapshot()
-          }
+      let result = this.$firestore('Cards')
+      if (this.unitNameFilter) {
+        result = result.where('unitName', '==', this.unitNameFilter)
       }
-    },
-    // スナップショットを取得するメソッド4パターン
-    async getNoFilteredCardsSnapshot() {
+      if (this.symbolFilter) {
+        result = result.where('symbols', 'array-contains', this.symbolFilter)
+      }
       if (this.lastFilteredCard) {
-        this.nextFilteredCards = await this.$firestore
-          .collection('Cards')
-          .startAfter(this.lastFilteredCard)
-          .limit(10)
-          .get()
-      } else {
-        this.nextFilteredCards = await this.$firestore
-          .collection('Cards')
-          .limit(10)
-          .get()
+        result = result.startAfter(this.lastFilteredCard)
       }
-    },
-    async getUnitNameFilteredCardsSnapshot() {
-      if (this.lastFilteredCard) {
-        this.nextFilteredCards = await this.$firestore
-          .collection('Cards')
-          .where('unitName', '==', this.unitNameFilter)
-          .startAfter(this.lastFilteredCard)
-          .limit(10)
-          .get()
-      } else {
-        this.nextFilteredCards = await this.$firestore
-          .collection('Cards')
-          .where('unitName', '==', this.unitNameFilter)
-          .limit(10)
-          .get()
-      }
-    },
-    async getSymbolFilteredCardsSnapshot() {
-      if (this.lastFilteredCard) {
-        this.nextFilteredCards = await this.$firestore
-          .collection('Cards')
-          .where('symbols', 'array-contains', this.symbolFilter)
-          .startAfter(this.lastFilteredCard)
-          .limit(10)
-          .get()
-      } else {
-        this.nextFilteredCards = await this.$firestore
-          .collection('Cards')
-          .where('symbols', 'array-contains', this.symbolFilter)
-          .limit(10)
-          .get()
-      }
-    },
-    async getUnitNameAndSymbolFilteredCardsSnapshot() {
-      if (this.lastFilteredCard) {
-        this.nextFilteredCards = await this.$firestore
-          .collection('Cards')
-          .where('unitName', '==', this.unitNameFilter)
-          .where('symbols', 'array-contains', this.symbolFilter)
-          .startAfter(this.lastFilteredCard)
-          .limit(10)
-          .get()
-      } else {
-        this.nextFilteredCards = await this.$firestore
-          .collection('Cards')
-          .where('unitName', '==', this.unitNameFilter)
-          .where('symbols', 'array-contains', this.symbolFilter)
-          .limit(10)
-          .get()
-      }
+      result = await result.limit(10).get()
+      return result
     },
     // 無限スクロールのために、最後に表示されているカードのスナップショットを取得しておく
     setLastFilteredCard() {
