@@ -10,7 +10,7 @@
       mobile-breakpoint="500"
     >
       <!--▼ ユニット名フィルター ****************************************▼-->
-      <v-container class="pb-0 mt-4">
+      <v-container class="pb-0 pt-4" style="height: 10vh">
         <v-autocomplete
           v-model="unitNameFilter"
           :items="unitNameFilterItems"
@@ -29,7 +29,7 @@
       <!--▲ ユニット名フィルター ****************************************▲-->
 
       <!--▼ シンボルフィルター ****************************************▼-->
-      <v-container class="py-0">
+      <v-container class="pb-0 pt-4" style="height: 10vh">
         <v-select
           v-model="symbolFilter"
           :items="symbolFilterItems"
@@ -57,7 +57,7 @@
       <v-tabs-items v-model="tab">
         <!--▼ タブ内容1:Search ****************************************▼-->
         <v-tab-item>
-          <v-list class="py-0 overflow-y-auto" height="450" outlined>
+          <v-list class="py-0 overflow-y-auto" height="65vh" outlined>
             <template v-for="(card, index) in filteredCards">
               <v-list-item
                 :key="'search-' + card._id"
@@ -88,10 +88,15 @@
                     outlined
                     width="100%"
                     small
-                    @click="myDeckCards.push(card)"
+                    @click="addCard(card)"
                     >１枚追加</v-btn
                   >
-                  <v-btn class="mb-1" outlined width="100%" small
+                  <v-btn
+                    class="mb-1"
+                    outlined
+                    width="100%"
+                    small
+                    @click="addFourCards(card)"
                     >４枚追加</v-btn
                   >
                   <v-btn
@@ -114,8 +119,8 @@
               spinner="spiral"
               @infinite="filteredCardsInfiniteHandler"
             >
-              <span slot="no-more">No More Cards</span>
-              <span slot="no-results">No More Cards</span>
+              <span slot="no-more"></span>
+              <span slot="no-results"></span>
             </infinite-loading>
           </v-list>
         </v-tab-item>
@@ -191,21 +196,22 @@
     <!--▲ 検索ドロワー ****************************************▲-->
 
     <!--▼ メイン画面 ****************************************▼-->
-    <v-container class="d-flex justify-space-between">
-      <v-form
-        v-model="myDeckName"
-        class="w-20 d-flex align-center"
-        @submit.prevent
-      >
-        <v-text-field type="text" label="myDeckName"></v-text-field>
+    <v-container class="">
+      <v-form class="w-20 d-flex align-center" @submit.prevent>
+        <v-text-field
+          v-model="myDeckName"
+          type="text"
+          label="myDeckName"
+        ></v-text-field>
       </v-form>
-      <div class="d-flex align-center">
-        <div>
-          <v-btn class="primary" width="100" @click="shareDeck">ツイート</v-btn>
-          <v-btn class="info" width="100" @click="saveDeck">保存</v-btn>
-          <v-btn @click="drawer = !drawer">ドロワー</v-btn>
-        </div>
-      </div>
+      <v-layout class="d-flex align-center">
+        <v-btn class="primary" width="25%" tile @click="shareDeck"
+          >ツイート</v-btn
+        >
+        <v-btn class="info" width="25%" tile @click="saveDeck">保存</v-btn>
+        <v-btn class="info" width="25%" tile @click="loadDeck">ロード</v-btn>
+        <v-btn width="25%" tile @click="drawer = !drawer">ドロワー</v-btn>
+      </v-layout>
     </v-container>
     <draggable
       v-model="myDeckCards"
@@ -217,12 +223,42 @@
       @change="onMoveCard"
     >
       <PickedCard
-        v-for="(card, index) in myDeckCards"
+        v-for="(card, index) in myDeckCardView"
         :key="index"
+        class="hidden-mobile-and-down"
         :img="card.image"
       ></PickedCard>
     </draggable>
+    <v-list>
+      <draggable
+        v-model="myDeckCards"
+        class=""
+        group="myDeckCardList"
+        :animation="200"
+        @start="drag = true"
+        @end="drag = false"
+        @change="onMoveCard"
+      >
+        <PickedCardList
+          v-for="(card, index) in myDeckCards"
+          :key="2 + index"
+          class="d-mobile-none"
+          :img="card.card.image"
+          :unit-name="card.card.unitName"
+          :title="card.card.title"
+          :count="card.count"
+          :symbols="card.card.symbols"
+          :color="card.color"
+          @on-click="onClick(card)"
+        >
+        </PickedCardList>
+      </draggable>
+    </v-list>
     {{ myDeckCards }}
+    {{ myDeckCardView }}
+    <!-- <v-img :src="require('@/static/img/B01/B01-001SR.png')">
+      <div class="fill-height gradient"></div>
+    </v-img> -->
   </v-container>
   <!--▲ メイン画面 ****************************************▲-->
 </template>
@@ -243,6 +279,7 @@ export default {
       myDeckCards: [],
       markCards: [],
       filteredCards: [],
+      useCardsRef: '',
 
       // UIコンポーネント関連
       drawer: null,
@@ -270,9 +307,71 @@ export default {
       ],
     }
   },
+  computed: {
+    myDeckCardView() {
+      const result = []
+      this.myDeckCards.forEach((cardObject) => {
+        const card = {
+          id: cardObject.card.id,
+          image: cardObject.card.image,
+        }
+        for (let i = 0; i < cardObject.count; i++) {
+          result.push(card)
+        }
+      })
+      return result
+    },
+  },
   methods: {
     saveDeck() {
-      console.log('saved')
+      if (this.useCardsRef === '') {
+        console.log('ref')
+        this.useCardsRef = this.$firestore
+          .collection('Users')
+          .doc()
+          .collection('Decks')
+          .doc()
+          .collection('UseCards')
+      }
+      this.myDeckCards.forEach((cardObject, index) => {
+        this.useCardsRef.doc().set(
+          {
+            card: {
+              id: cardObject.card.id,
+              title: cardObject.card.title,
+              unitName: cardObject.card.unitName,
+              symbols: cardObject.card.symbols,
+              image: cardObject.card.image,
+            },
+            count: cardObject.count,
+            displayOrder: index,
+          },
+          { merge: true }
+        )
+      })
+      alert('saved')
+    },
+    async loadDeck() {
+      const snapshot = await this.useCardsRef
+        .orderBy('displayOrder', 'asc')
+        .get()
+      const data = snapshot.docs.map((snapshot) => {
+        const result = {
+          card: {
+            _id: snapshot.data().card.id,
+            image: snapshot.data().card.image,
+            symbols: snapshot.data().card.symbols,
+            title: snapshot.data().card.title,
+            unitName: snapshot.data().card.unitName,
+          },
+          count: snapshot.data().count,
+        }
+        console.log(result)
+        this.addSymbolColorData(snapshot.data().card.symbols, result)
+        return result
+      })
+      this.myDeckCards = data
+      alert('loaded')
     },
     shareDeck() {
       console.log('shared')
@@ -553,6 +652,43 @@ export default {
     //     return false
     //   }
     // },
+    addCard(card) {
+      const newId = card._id.replace('+', 'plus')
+      const imageUrl = '/img/' + card.recording + '/' + newId + '.png'
+      const result = {
+        card: {
+          id: card._id,
+          title: card.title,
+          unitName: card.unitName,
+          symbols: card.symbols,
+          image: imageUrl,
+        },
+        count: 1,
+      }
+      this.addSymbolColorData(card.symbols, result)
+
+      const cardExists = this.myDeckCards.filter((useCard) => {
+        return useCard.card.id === result.card.id
+      })
+      if (cardExists.length === 0) {
+        this.myDeckCards.push(result)
+      } else {
+        const i = this.myDeckCards.indexOf(cardExists[0])
+        this.myDeckCards[i].count++
+      }
+    },
+    addFourCards(card) {
+      for (let i = 0; i < 4; i++) {
+        this.addCard(card)
+      }
+    },
+    onClick(card) {
+      card.count--
+      const i = this.myDeckCards.indexOf(card)
+      if (card.count === 0) {
+        this.myDeckCards.splice(i, 1)
+      }
+    },
   },
 }
 </script>
@@ -574,4 +710,11 @@ export default {
     rgba(245, 245, 245, 1) 60%
   );
 }
+/* .gradient {
+  background-image: linear-gradient(
+    90deg,
+    rgb(109, 213, 208) 30%,
+    rgba(109, 213, 208, 0) 70%
+  );
+} */
 </style>
