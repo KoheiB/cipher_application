@@ -554,7 +554,13 @@ export default {
     displayCards() {
       const result = this.nextFilteredCards.docs.map((doc) => {
         const docData = doc.data()
-        this.addSymbolColorData(docData.symbols, docData)
+        const symbolItem = this.symbolItems.filter((item) => {
+          return item.name === docData.symbols[0]
+        })
+        docData.color = symbolItem[0].color
+        if (this.checkDoubleSymbol(docData.symbols, docData)) {
+          docData.color = this.checkDoubleSymbol(docData.symbols, docData)
+        }
         return docData
       })
       result.forEach((card) => {
@@ -563,45 +569,14 @@ export default {
       })
       return result
     },
-    // シンボルにより背景色をカードのデータに追加するメソッド
-    addSymbolColorData(symbols, data) {
+    checkDoubleSymbol(symbols, data) {
       switch (symbols[1]) {
         case '聖痕':
-          data.color = 'red-blue'
-          break
+          return 'red-blue'
         case '暗夜':
-          data.color = 'black-white'
-          break
+          return 'black-white'
         default:
-          switch (symbols[0]) {
-            case 'なし':
-              data.color = 'cyan lighten-5'
-              break
-            case '光の剣':
-              data.color = 'red lighten-3'
-              break
-            case '聖痕':
-              data.color = 'blue lighten-4'
-              break
-            case '白夜':
-              data.color = 'grey lighten-4'
-              break
-            case '暗夜':
-              data.color = 'grey lighten-1'
-              break
-            case 'メダリオン':
-              data.color = 'green lighten-3'
-              break
-            case '神器':
-              data.color = 'deep-purple lighten-3'
-              break
-            case '聖戦旗':
-              data.color = 'yellow lighten-4'
-              break
-            case '女神紋':
-              data.color = 'brown lighten-3'
-              break
-          }
+          return null
       }
     },
     // サーチ無限スクロール
