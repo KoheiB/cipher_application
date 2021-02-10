@@ -219,12 +219,12 @@
       @end="drag = false"
       @change="onMoveCard"
     >
-      <PickedCard
+      <!-- <PickedCard
         v-for="(card, index) in myDeckCardView"
         :key="index"
         class="hidden-mobile-and-down"
-        :img="card.imageUrl"
-      ></PickedCard>
+        :image-url="card.info.imageUrl"
+      ></PickedCard> -->
     </draggable>
     <v-list>
       <draggable
@@ -240,19 +240,19 @@
           v-for="(card, index) in myDeckCards"
           :key="2 + index"
           class="d-mobile-none"
-          :img="card.card.imageUrl"
-          :unit-name="card.card.unitName"
-          :title="card.card.title"
+          :unit-name="card.info.unitName"
+          :title="card.info.title"
+          :image-url="card.info.imageUrl"
+          :symbols="card.info.symbols"
+          :color="card.info.color"
           :count="card.count"
-          :symbols="card.card.symbols"
-          :color="card.color"
-          @on-click="onClick(card)"
+          @card-list-click="removeCard(card)"
         >
         </PickedCardList>
       </draggable>
     </v-list>
     {{ myDeckCards }}
-    {{ myDeckCardView }}
+    <!-- {{ myDeckCardView }} -->
     <!-- <v-img :src="require('@/static/img/B01/B01-001SR.png')">
       <div class="fill-height gradient"></div>
     </v-img> -->
@@ -303,21 +303,21 @@ export default {
       symbolFilter: undefined,
     }
   },
-  computed: {
-    myDeckCardView() {
-      const result = []
-      this.myDeckCards.forEach((cardObject) => {
-        const card = {
-          id: cardObject.info.id,
-          imageUrl: cardObject.info.imageUrl,
-        }
-        for (let i = 0; i < cardObject.count; i++) {
-          result.push(card)
-        }
-      })
-      return result
-    },
-  },
+  // computed: {
+  //   myDeckCardView() {
+  //     const result = []
+  //     this.myDeckCards.forEach((cardObject) => {
+  //       const card = {
+  //         id: cardObject.info.id,
+  //         imageUrl: cardObject.info.imageUrl,
+  //       }
+  //       for (let i = 0; i < cardObject.count; i++) {
+  //         result.push(card)
+  //       }
+  //     })
+  //     return result
+  //   },
+  // },
   methods: {
     saveDeck() {
       if (this.useCardsRef === '') {
@@ -364,7 +364,6 @@ export default {
           },
           count: snapshot.data().count,
         }
-        console.log(result)
         return result
       })
       this.myDeckCards = data
@@ -649,7 +648,7 @@ export default {
         this.addCard(card)
       }
     },
-    onClick(card) {
+    removeCard(card) {
       card.count--
       const i = this.myDeckCards.indexOf(card)
       if (card.count === 0) {
