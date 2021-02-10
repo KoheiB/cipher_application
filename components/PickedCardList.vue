@@ -3,7 +3,7 @@
     class="px-0 mr-8 ml-2"
     :class="color"
     style="margin-bottom: 1px"
-    @click="onClick"
+    @click="$emit('card-list-click')"
   >
     <v-list-item-avatar class="ma-0 mr-2" tile height="48" width="72">
       <v-img :src="imageUrl" position="top" />
@@ -55,11 +55,6 @@ export default {
     color: {
       type: String,
       required: true,
-    },
-  },
-  methods: {
-    onClick() {
-      this.$emit('on-click')
     },
   },
 }
