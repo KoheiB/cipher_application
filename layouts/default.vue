@@ -39,6 +39,7 @@ export default {
     logout() {
       this.$fireAuth.signOut().then(() => {
         this.isLogin = false
+        this.$router.go({ path: this.$router.currentRoute.path, force: true })
       })
     },
   },

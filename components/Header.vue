@@ -60,6 +60,10 @@
       </v-toolbar-items>
     </div>
     <div v-show="!isLogin" class="mx-5">
+      <v-btn small class="primary" @click="regist">
+        <v-icon>mdi-account-plus</v-icon>
+        <span class="hidden-ipad-and-down">新規登録</span>
+      </v-btn>
       <v-btn small class="info" @click="login">
         <v-icon>mdi-login</v-icon>
         <span class="hidden-ipad-and-down">ログイン</span>
