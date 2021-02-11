@@ -27,8 +27,8 @@ let objects = []; //この配列の中にパースしたcsvの中身をkey-value
 // データ準備
 responses.forEach(function(response) {
   objects.push({
-    _id:            response[0] + response[1],
-    card_no :       response[0],
+    id:             response[0] + response[1],
+    no:             response[0],
     rare:           response[1],
     recording:      response[2],
     title:          response[3],
@@ -88,7 +88,7 @@ devObjects.forEach(function(devObject){
   const batch = db.batch();
 
   devObject.forEach(function(object){
-      let id = object["_id"]
+      let id = object["id"]
       batch.set(db.collection('Cards').doc(id), object)
       dataSetCount++;
   });

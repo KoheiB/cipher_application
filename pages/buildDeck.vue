@@ -639,7 +639,8 @@ export default {
           .startsWith(queryText.toLocaleLowerCase()) ||
         item.hiragana
           .toLocaleLowerCase()
-          .startsWith(queryText.toLocaleLowerCase())
+          .startsWith(queryText.toLocaleLowerCase()) ||
+        item.etc.toLocaleLowerCase().startsWith(queryText.toLocaleLowerCase())
       )
     },
     // TODOisMarked(card) {
