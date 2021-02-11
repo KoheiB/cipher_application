@@ -8,6 +8,7 @@
                   - DocumentId : Cards.DocumentId
                     - info :Map
                       - id : String
+                      - recording : String 
                       - title : String
                       - unitName : String
                       - symbols : Array[String]
@@ -15,11 +16,13 @@
                     - displayOrder : Number
                 - heroCard : Map
                   - id : String
+                  - recording : String 
                   - title : String
                   - unitName : String
                   - symbols : Array[String]
                 - mainClassChangeCard : Map
                   - id : String
+                  - recording : String 
                   - title : String
                   - unitName : String
                   - symbols : Array[String]
@@ -27,6 +30,7 @@
                   - DocumentId : Cards.DocumentId
                     - info :Map
                       - id : String
+                      - recording : String 
                       - title : String
                       - unitName : String
                       - symbols : Array[String]
