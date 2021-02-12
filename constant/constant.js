@@ -700,7 +700,7 @@ const _symbolItems = [
     gradation: 'purple-gradation',
   },
   {
-    name: '聖戦器',
+    name: '聖戦旗',
     color: 'yellow lighten-4',
     gradation: 'yellow-gradation',
   },

@@ -16,13 +16,13 @@ const checkDoubleSymbols = function (symbols) {
   }
 }
 const getSymbolColor = function (symbols) {
-  const symbolItem = symbolItems.filter((item) => {
-    return item.name === symbols[0]
-  })
   const doubleSymbols = checkDoubleSymbols(symbols)
   if (doubleSymbols) {
     return doubleSymbols.color
   } else {
+    const symbolItem = symbolItems.filter((item) => {
+      return item.name === symbols[0]
+    })
     return symbolItem[0].color
   }
 }
