@@ -13,7 +13,7 @@
       <v-container class="pb-0 pt-4" style="height: 10vh">
         <v-autocomplete
           v-model="unitNameFilter"
-          :items="unitNameFilterItems"
+          :items="unitNameItems"
           :filter="filterObject"
           item-text="name"
           label="ユニット名で検索"
@@ -22,30 +22,39 @@
           dense
           clearable
           outlined
-          @change="changeFilter()"
+          @change="searchCards()"
         >
         </v-autocomplete>
       </v-container>
       <!--▲ ユニット名フィルター ****************************************▲-->
 
-      <!--▼ シンボルフィルター ****************************************▼-->
-      <v-container class="pb-0 pt-4" style="height: 10vh">
+      <!--▼ シンボル/出撃コストフィルター ****************************************▼-->
+      <v-container class="pb-0 pt-4 d-flex" style="height: 10vh">
         <v-select
           v-model="symbolFilter"
           :items="symbolItems"
           item-text="name"
-          label="シンボルで絞り込み"
-          prepend-inner-icon="mdi-filter"
+          style="width: 60%; padding-right: 1px"
+          label="シンボル"
           dense
           clearable
           outlined
-          @change="changeFilter()"
-        ></v-select>
+          @change="searchCards()"
+        />
+        <v-select
+          v-model="sortieCostFilter"
+          :items="sortieCostFilterItems"
+          style="width: 40%; padding-left: 1px"
+          label="出撃コスト"
+          dense
+          clearable
+          outlined
+        />
       </v-container>
       <!--▲ シンボルフィルター ****************************************▲-->
 
       <!--▼ タブ選択画面 ****************************************▼-->
-      <v-tabs v-model="tab" grow>
+      <v-tabs v-model="tab" grow height="5vh">
         <v-tab style="max-width: 50%"
           ><v-icon class="pr-1">mdi-cards</v-icon>Search</v-tab
         >
@@ -58,7 +67,7 @@
       <v-tabs-items v-model="tab">
         <!--▼ タブ内容1:Search ****************************************▼-->
         <v-tab-item>
-          <v-list class="py-0 overflow-y-auto" height="65vh" outlined>
+          <v-list class="py-0 overflow-y-auto" height="75vh" outlined>
             <template v-for="(card, index) in filteredCards">
               <v-list-item
                 :key="'search-' + card.id"
@@ -264,7 +273,11 @@
 <script>
 import draggable from 'vuedraggable'
 import InfiniteLoading from 'vue-infinite-loading'
-import { unitNameFilterItems, symbolItems } from '../constant/constant'
+import {
+  unitNameItems,
+  symbolItems,
+  sortieCostItems,
+} from '../constant/constant'
 export default {
   components: {
     draggable,
@@ -288,11 +301,15 @@ export default {
 
       // ユニット名フィルター関連
       unitNameFilter: undefined,
-      unitNameFilterItems,
+      unitNameItems,
 
       // シンボルフィルター関連
       symbolFilter: undefined,
       symbolItems,
+
+      // 出撃コストフィルター関連
+      sortieCostFilter: undefined,
+      sortieCostItems,
     }
   },
   // computed: {
@@ -426,7 +443,7 @@ export default {
 
     // ▼ 検索ドロワーに関するメソッド ****************************************▼
     // フィルターを変更した時の処理
-    async changeFilter() {
+    async searchCards() {
       await this.resetFilter()
       await this.getFilteredCardsSnapshot()
       await this.setLastFilteredCard()
@@ -440,94 +457,21 @@ export default {
     },
     // フィルターのパターンによって異なるスナップショットを取得
     async getFilteredCardsSnapshot() {
-      switch (this.unitNameFilter) {
-        case undefined:
-          switch (this.symbolFilter) {
-            // ユニット名:false、シンボル:false
-            case undefined:
-              await this.getNoFilteredCardsSnapshot()
-              break
-            // ユニット名:false、シンボル:true
-            default:
-              await this.getSymbolFilteredCardsSnapshot()
-          }
-          break
-        default:
-          switch (this.symbolFilter) {
-            // ユニット名:true、シンボル:false
-            case undefined:
-              await this.getUnitNameFilteredCardsSnapshot()
-              break
-            // ユニット名:true、シンボル:true
-            default:
-              await this.getUnitNameAndSymbolFilteredCardsSnapshot()
-          }
+      let result = this.$firestore('Cards')
+      if (this.unitNameFilter) {
+        result = result.where('unitName', '==', this.unitNameFilter)
       }
-    },
-    // スナップショットを取得するメソッド4パターン
-    async getNoFilteredCardsSnapshot() {
+      if (this.symbolFilter) {
+        result = result.where('symbols', 'array-contains', this.symbolFilter)
+      }
+      if (this.sortieCostFilter) {
+        result = result.where('sortie_cost', '==', this.sortieCostFilter)
+      }
       if (this.lastFilteredCard) {
-        this.nextFilteredCards = await this.$firestore
-          .collection('Cards')
-          .startAfter(this.lastFilteredCard)
-          .limit(10)
-          .get()
-      } else {
-        this.nextFilteredCards = await this.$firestore
-          .collection('Cards')
-          .limit(10)
-          .get()
+        result = result.startAfter(this.lastFilteredCard)
       }
-    },
-    async getUnitNameFilteredCardsSnapshot() {
-      if (this.lastFilteredCard) {
-        this.nextFilteredCards = await this.$firestore
-          .collection('Cards')
-          .where('unitName', '==', this.unitNameFilter)
-          .startAfter(this.lastFilteredCard)
-          .limit(10)
-          .get()
-      } else {
-        this.nextFilteredCards = await this.$firestore
-          .collection('Cards')
-          .where('unitName', '==', this.unitNameFilter)
-          .limit(10)
-          .get()
-      }
-    },
-    async getSymbolFilteredCardsSnapshot() {
-      if (this.lastFilteredCard) {
-        this.nextFilteredCards = await this.$firestore
-          .collection('Cards')
-          .where('symbols', 'array-contains', this.symbolFilter)
-          .startAfter(this.lastFilteredCard)
-          .limit(10)
-          .get()
-      } else {
-        this.nextFilteredCards = await this.$firestore
-          .collection('Cards')
-          .where('symbols', 'array-contains', this.symbolFilter)
-          .limit(10)
-          .get()
-      }
-    },
-    async getUnitNameAndSymbolFilteredCardsSnapshot() {
-      if (this.lastFilteredCard) {
-        this.nextFilteredCards = await this.$firestore
-          .collection('Cards')
-          .where('unitName', '==', this.unitNameFilter)
-          .where('symbols', 'array-contains', this.symbolFilter)
-          .startAfter(this.lastFilteredCard)
-          .limit(10)
-          .get()
-      } else {
-        this.nextFilteredCards = await this.$firestore
-          .collection('Cards')
-          .where('unitName', '==', this.unitNameFilter)
-          .where('symbols', 'array-contains', this.symbolFilter)
-          .limit(10)
-          .get()
-      }
+      result = await result.limit(10).get()
+      return result
     },
     // 無限スクロールのために、最後に表示されているカードのスナップショットを取得しておく
     setLastFilteredCard() {
