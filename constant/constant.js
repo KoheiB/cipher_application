@@ -683,10 +683,29 @@ const _unitNameFilterItems = [
   { name: 'ンン', hiragana: 'んん', etc: '' },
 ]
 
-export default {
-  data() {
-    return {
-      unitNameFilterItems: _unitNameFilterItems,
-    }
+const _symbolItems = [
+  { name: 'なし', color: 'cyan lighten-5', gradation: 'cyan-gradation' },
+  { name: '光の剣', color: 'red lighten-3', gradation: 'red-gradation' },
+  { name: '聖痕', color: 'blue lighten-4', gradation: 'blue-gradation' },
+  { name: '白夜', color: 'grey lighten-4', gradation: 'white-gradation' },
+  { name: '暗夜', color: 'grey lighten-1', gradation: 'black-gradation' },
+  {
+    name: 'メダリオン',
+    color: 'green lighten-3',
+    gradation: 'green-gradation',
   },
-}
+  {
+    name: '神器',
+    color: 'deep-purple lighten-3',
+    gradation: 'purple-gradation',
+  },
+  {
+    name: '聖戦器',
+    color: 'yellow lighten-4',
+    gradation: 'yellow-gradation',
+  },
+  { name: '女神紋', color: 'brown lighten-3', gradation: 'brown-gradation' },
+]
+
+export const unitNameFilterItems = _unitNameFilterItems
+export const symbolItems = _symbolItems

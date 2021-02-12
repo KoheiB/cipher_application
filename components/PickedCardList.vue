@@ -32,20 +32,12 @@
 <script>
 export default {
   props: {
-    imageUrl: {
+    title: {
       type: String,
       required: true,
     },
     unitName: {
       type: String,
-      required: true,
-    },
-    title: {
-      type: String,
-      required: true,
-    },
-    count: {
-      type: Number,
       required: true,
     },
     symbols: {
@@ -54,6 +46,14 @@ export default {
     },
     color: {
       type: String,
+      required: true,
+    },
+    gradation: {
+      type: String,
+      required: true,
+    },
+    count: {
+      type: Number,
       required: true,
     },
   },

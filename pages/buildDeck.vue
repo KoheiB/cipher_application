@@ -50,7 +50,7 @@
           ><v-icon class="pr-1">mdi-cards</v-icon>Search</v-tab
         >
         <v-tab style="max-width: 50%"
-          ><v-icon class="pr-1">mdi-bookkeep-multiple</v-icon>Keep</v-tab
+          ><v-icon class="pr-1">mdi-bookmark-multiple</v-icon>Keep</v-tab
         >
       </v-tabs>
       <!--▲ タブ選択画面 ****************************************▲-->
@@ -263,23 +263,12 @@
 <script>
 import draggable from 'vuedraggable'
 import InfiniteLoading from 'vue-infinite-loading'
-import unitNameFilterItems from '../mixins/UnitNameFilterItems'
-import symbolItems from '../mixins/Symbols'
-import getSymbolColor from '../mixins/Symbols'
-import getSymbolGradation from '../mixins/Symbols'
-import getImageUrl from '../mixins/GetImageUrl'
+import { unitNameFilterItems, symbolItems } from '../constant/constant'
 export default {
   components: {
     draggable,
     InfiniteLoading,
   },
-  mixins: [
-    unitNameFilterItems,
-    symbolItems,
-    getSymbolColor,
-    getSymbolGradation,
-    getImageUrl,
-  ],
   data() {
     return {
       myDeckName: '',
@@ -298,9 +287,11 @@ export default {
 
       // ユニット名フィルター関連
       unitNameFilter: undefined,
+      unitNameFilterItems,
 
       // シンボルフィルター関連
       symbolFilter: undefined,
+      symbolItems,
     }
   },
   // computed: {
@@ -338,7 +329,7 @@ export default {
               title: card.title,
               unitName: card.unitName,
               symbols: card.symbols,
-              imageUrl: card.imageUrl,
+              recording: card.recording,
             },
             count: cardObject.count,
             displayOrder: index,
@@ -357,10 +348,10 @@ export default {
         const result = {
           info: {
             id: card.id,
-            imageUrl: card.imageUrl,
-            symbols: card.symbols,
             title: card.title,
             unitName: card.unitName,
+            symbols: card.symbols,
+            recording: card.recording,
           },
           count: snapshot.data().count,
         }
@@ -547,20 +538,17 @@ export default {
     displayCards() {
       const result = this.nextFilteredCards.docs.map((doc) => {
         const card = doc.data()
-        card.color = this.getSymbolColor(card)
-        card.gradaton = this.getSymbolGradation(card)
-        if (this.checkDoubleSymbol(card.symbols, card)) {
-          card.color = this.checkDoubleSymbol(card.symbols, card)
-        }
+        card.color = this.$color(card.symbols)
+        card.gradaton = this.$gradation(card.symbols)
         return card
       })
       result.forEach((card) => {
-        card.imageUrl = this.getImageUrl(card)
+        card.imageUrl = this.$imageUrl(card)
         this.filteredCards.push(card)
       })
       return result
     },
-    checkDoubleSymbol(symbols, data) {
+    checkDoubleSymbol(symbols) {
       switch (symbols[1]) {
         case '聖痕':
           return 'red-blue'
@@ -627,9 +615,9 @@ export default {
           title: card.title,
           unitName: card.unitName,
           symbols: card.symbols,
-          color: this.getSymbolColor(card),
-          gradation: this.getSymbolGradation(card),
-          imageUrl: this.getImageUrl(card),
+          recording: card.recording,
+          color: this.$color(card.symbols),
+          gradation: this.$gradation(card.symbols),
         },
         count: 1,
       }
