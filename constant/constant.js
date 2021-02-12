@@ -1,4 +1,4 @@
-const _unitNameFilterItems = [
+const _unitNameItems = [
   { name: 'アイク', hiragana: 'あいく', etc: '' },
   { name: 'アイラ', hiragana: 'あいら', etc: '' },
   { name: 'アウグスト', hiragana: 'あうぐすと', etc: '' },
@@ -707,5 +707,8 @@ const _symbolItems = [
   { name: '女神紋', color: 'brown lighten-3', gradation: 'brown-gradation' },
 ]
 
-export const unitNameFilterItems = _unitNameFilterItems
+const _sortieCostItems = ['0', '1', '2', '3', '4', '5', '6', '7', 'X']
+
+export const unitNameItems = _unitNameItems
 export const symbolItems = _symbolItems
+export const sortieCostItems = _sortieCostItems

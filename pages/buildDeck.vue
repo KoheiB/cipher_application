@@ -43,15 +43,16 @@
         />
         <v-select
           v-model="sortieCostFilter"
-          :items="sortieCostFilterItems"
+          :items="sortieCostItems"
           style="width: 40%; padding-left: 1px"
           label="出撃コスト"
           dense
           clearable
           outlined
+          @change="searchCards()"
         />
       </v-container>
-      <!--▲ シンボルフィルター ****************************************▲-->
+      <!--▲ シンボル/出撃コストフィルター ****************************************▲-->
 
       <!--▼ タブ選択画面 ****************************************▼-->
       <v-tabs v-model="tab" grow height="5vh">
@@ -457,7 +458,7 @@ export default {
     },
     // フィルターのパターンによって異なるスナップショットを取得
     async getFilteredCardsSnapshot() {
-      let result = this.$firestore('Cards')
+      let result = this.$firestore.collection('Cards')
       if (this.unitNameFilter) {
         result = result.where('unitName', '==', this.unitNameFilter)
       }
@@ -471,7 +472,7 @@ export default {
         result = result.startAfter(this.lastFilteredCard)
       }
       result = await result.limit(10).get()
-      return result
+      this.nextFilteredCards = result
     },
     // 無限スクロールのために、最後に表示されているカードのスナップショットを取得しておく
     setLastFilteredCard() {
