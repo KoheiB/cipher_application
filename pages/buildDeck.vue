@@ -242,9 +242,10 @@
           class="d-mobile-none"
           :title="card.info.title"
           :unit-name="card.info.unitName"
-          :image-url="card.info.imageUrl"
           :symbols="card.info.symbols"
           :color="card.info.color"
+          :gradation="card.info.gradation"
+          :image-url="card.info.imageUrl"
           :count="card.count"
           @card-list-click="removeCard(card)"
         >
@@ -540,10 +541,10 @@ export default {
         const card = doc.data()
         card.color = this.$color(card.symbols)
         card.gradaton = this.$gradation(card.symbols)
+        card.imageUrl = this.$imageUrl(card.id, card.recording)
         return card
       })
       result.forEach((card) => {
-        card.imageUrl = this.$imageUrl(card)
         this.filteredCards.push(card)
       })
       return result
@@ -614,10 +615,11 @@ export default {
           id: card.id,
           title: card.title,
           unitName: card.unitName,
-          symbols: card.symbols,
           recording: card.recording,
+          symbols: card.symbols,
           color: this.$color(card.symbols),
           gradation: this.$gradation(card.symbols),
+          imageUrl: this.$imageUrl(card.id, card.recording),
         },
         count: 1,
       }

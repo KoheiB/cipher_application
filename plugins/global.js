@@ -1,8 +1,8 @@
 import { symbolItems } from '../constant/constant'
 
-const getImageUrl = function (card) {
-  const fileName = card.id.replace('+', 'plus')
-  const result = '/img/' + card.recording + '/' + fileName + '.png'
+const getImageUrl = function (id, recording) {
+  const fileName = id.replace('+', 'plus')
+  const result = '/img/' + recording + '/' + fileName + '.png'
   return result
 }
 const checkDoubleSymbols = function (symbols) {

@@ -52,6 +52,10 @@ export default {
       type: String,
       required: true,
     },
+    imageUrl: {
+      type: String,
+      required: true,
+    },
     count: {
       type: Number,
       required: true,
