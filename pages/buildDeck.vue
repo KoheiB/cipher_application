@@ -68,7 +68,16 @@
       <v-tabs-items v-model="tab">
         <!--▼ タブ内容1:Search ****************************************▼-->
         <v-tab-item>
-          <v-list class="py-0 overflow-y-auto" height="75vh" outlined>
+          <v-list
+            class="py-0 overflow-y-auto"
+            :height="
+              // eslint-disable-next-line prettier/prettier
+              $vuetify.breakpoint.mobileAndDown
+                ? '75vh'
+                : 'calc(75vh - 48px)'
+            "
+            outlined
+          >
             <template v-for="(card, index) in filteredCards">
               <v-list-item
                 :key="'search-' + card.id"
