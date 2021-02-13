@@ -7,17 +7,16 @@
       clipped
       width="90%"
       style="max-width: 400px"
-      mobile-breakpoint="500"
+      :mobile-breakpoint="$vuetify.breakpoint.mobileBreakpoint"
     >
       <!--▼ ユニット名フィルター ****************************************▼-->
-      <v-container class="pb-0 pt-4" style="height: 10vh">
+      <v-container class="pb-0 pt-4" style="height: 10vh; max-height: 60px">
         <v-autocomplete
           v-model="unitNameFilter"
           :items="unitNameItems"
-          :filter="filterObject"
+          :filter="checkUnitName"
           item-text="name"
-          label="ユニット名で検索"
-          prepend-inner-icon="mdi-human-handsdown"
+          label="ユニット名"
           autofocus
           dense
           clearable
@@ -29,7 +28,10 @@
       <!--▲ ユニット名フィルター ****************************************▲-->
 
       <!--▼ シンボル/出撃コストフィルター ****************************************▼-->
-      <v-container class="pb-0 pt-4 d-flex" style="height: 10vh">
+      <v-container
+        class="pb-0 pt-4 d-flex"
+        style="height: 10vh; max-height: 60px"
+      >
         <v-select
           v-model="symbolFilter"
           :items="symbolItems"
@@ -45,7 +47,7 @@
           v-model="sortieCostFilter"
           :items="sortieCostItems"
           style="width: 40%; padding-left: 1px"
-          label="出撃コスト"
+          label="出撃"
           dense
           clearable
           outlined
@@ -72,13 +74,11 @@
             class="py-0 overflow-y-auto"
             :height="
               // eslint-disable-next-line prettier/prettier
-              $vuetify.breakpoint.mobileAndDown
-                ? '75vh'
-                : 'calc(75vh - 48px)'
+              $vuetify.breakpoint.mobile ? '75vh' : 'calc(75vh - 48px)'
             "
             outlined
           >
-            <template v-for="(card, index) in filteredCards">
+            <template v-for="(card, index) in searchedCards">
               <v-list-item
                 :key="'search-' + card.id"
                 :class="card.color"
@@ -128,14 +128,14 @@
                 </v-list-item-action>
               </v-list-item>
               <v-divider
-                v-if="index < filteredCards.length - 1"
+                v-if="index < searchedCards.length - 1"
                 :key="index"
               ></v-divider>
             </template>
             <infinite-loading
-              ref="filteredCardsInfiniteLoading"
+              ref="searchedCardsInfiniteLoading"
               spinner="spiral"
-              @infinite="filteredCardsInfiniteHandler"
+              @infinite="searchedCardsInfiniteHandler"
             >
               <span slot="no-more"></span>
               <span slot="no-results"></span>
@@ -175,7 +175,7 @@
                     outlined
                     width="100%"
                     small
-                    @click="myDeckCards.push(card)"
+                    @click="useCards.push(card)"
                     >１枚追加</v-btn
                   >
                   <v-btn class="mb-1" outlined width="100%" small
@@ -192,7 +192,7 @@
                 </v-list-item-action>
               </v-list-item>
               <v-divider
-                v-if="index < filteredCards.length - 1"
+                v-if="index < searchedCards.length - 1"
                 :key="index"
               ></v-divider>
             </template>
@@ -215,9 +215,9 @@
     <v-container class="">
       <v-form @submit.prevent>
         <v-text-field
-          v-model="myDeckName"
+          v-model="deckName"
           type="text"
-          label="myDeckName"
+          label="deckName"
         ></v-text-field>
       </v-form>
       <v-layout class="d-flex align-center">
@@ -230,24 +230,24 @@
       </v-layout>
     </v-container>
     <draggable
-      v-model="myDeckCards"
+      v-model="useCards"
       class="d-flex flex-wrap"
-      group="myDeckCards"
+      group="useCards"
       :animation="200"
       @start="drag = true"
       @end="drag = false"
       @change="onMoveCard"
     >
-      <!-- <PickedCard
+      <!-- <UseCards
         v-for="(card, index) in myDeckCardView"
         :key="index"
         class="hidden-mobile-and-down"
         :image-url="card.info.imageUrl"
-      ></PickedCard> -->
+      ></UseCards> -->
     </draggable>
     <v-list>
       <draggable
-        v-model="myDeckCards"
+        v-model="useCards"
         class=""
         group="myDeckCardList"
         :animation="200"
@@ -255,8 +255,8 @@
         @end="drag = false"
         @change="onMoveCard"
       >
-        <PickedCardList
-          v-for="(card, index) in myDeckCards"
+        <UseCardsObj
+          v-for="(card, index) in useCards"
           :key="2 + index"
           class="d-mobile-none"
           :title="card.info.title"
@@ -268,10 +268,10 @@
           :count="card.count"
           @card-list-click="removeCard(card)"
         >
-        </PickedCardList>
+        </UseCardsObj>
       </draggable>
     </v-list>
-    {{ myDeckCards }}
+    {{ useCards }}
     <!-- {{ myDeckCardView }} -->
     <!-- <v-img :src="require('@/static/img/B01/B01-001SR.png')">
       <div class="fill-height gradient"></div>
@@ -295,37 +295,40 @@ export default {
   },
   data() {
     return {
-      myDeckName: '',
-      myDeckCards: [],
+      deckName: '',
+      useCards: [],
       keepCards: [],
-      filteredCards: [],
       useCardsRef: '',
 
       // UIコンポーネント関連
       drawer: null,
       tab: null,
 
-      // ページネーション関連
-      nextFilteredCards: null,
-      lastFilteredCard: null,
+      // ▼ カード検索関連 ****************************************▼
+      searchedCards: [],
 
-      // ユニット名フィルター関連
+      // ページネーション
+      nextLoadCards: null,
+      lastLoadCard: null,
+
+      // ユニット名フィルター
       unitNameFilter: undefined,
       unitNameItems,
 
-      // シンボルフィルター関連
+      // シンボルフィルター
       symbolFilter: undefined,
       symbolItems,
 
-      // 出撃コストフィルター関連
+      // 出撃コストフィルター
       sortieCostFilter: undefined,
       sortieCostItems,
+      // ▲ カード検索関連 ****************************************▲
     }
   },
   // computed: {
   //   myDeckCardView() {
   //     const result = []
-  //     this.myDeckCards.forEach((cardObject) => {
+  //     this.useCards.forEach((cardObject) => {
   //       const card = {
   //         id: cardObject.info.id,
   //         imageUrl: cardObject.info.imageUrl,
@@ -348,8 +351,8 @@ export default {
           .doc()
           .collection('UseCards')
       }
-      this.myDeckCards.forEach((cardObject, index) => {
-        const card = cardObject.info
+      this.useCards.forEach((cardObj, index) => {
+        const card = cardObj.info
         this.useCardsRef.doc().set(
           {
             info: {
@@ -359,7 +362,7 @@ export default {
               symbols: card.symbols,
               recording: card.recording,
             },
-            count: cardObject.count,
+            count: cardObj.count,
             displayOrder: index,
           },
           { merge: true }
@@ -385,7 +388,7 @@ export default {
         }
         return result
       })
-      this.myDeckCards = data
+      this.useCards = data
       alert('loaded')
     },
     shareDeck() {
@@ -402,16 +405,16 @@ export default {
         // 後ろにカードを移動した場合
         // 配列の順序をreverseして、末尾から探索できるようにしておく
         // これにより、ドラッグして移動したカードが元より後ろの順で検知される
-        this.myDeckCards.reverse()
+        this.useCards.reverse()
 
-        const cardObjects = this.toCardObjects(this.myDeckCards)
-        this.myDeckCards = this.toArrayCards(cardObjects)
+        const cardObjects = this.toCardObjects(this.useCards)
+        this.useCards = this.toArrayCards(cardObjects)
         // 逆順にしたものを元の順に戻す
-        this.myDeckCards.reverse()
+        this.useCards.reverse()
       } else if (newIndex < oldIndex) {
         // 前にカードを移動した場合
-        const cardObjects = this.toCardObjects(this.myDeckCards)
-        this.myDeckCards = this.toArrayCards(cardObjects)
+        const cardObjects = this.toCardObjects(this.useCards)
+        this.useCards = this.toArrayCards(cardObjects)
       }
     },
     toCardObjects(cards) {
@@ -455,94 +458,17 @@ export default {
     // フィルターを変更した時の処理
     async searchCards() {
       await this.resetFilter()
-      await this.getFilteredCardsSnapshot()
-      await this.setLastFilteredCard()
-      await this.displayCards()
-      await this.$refs.filteredCardsInfiniteLoading.stateChanger.reset()
+      await this.getNextLoadCardsSnapshot()
+      await this.setLastLoadCard()
+      await this.displayNextLoadCards()
+      await this.$refs.searchedCardsInfiniteLoading.stateChanger.reset()
     },
     resetFilter() {
-      this.filteredCards = []
-      this.nextFilteredCards = null
-      this.lastFilteredCard = null
+      this.searchedCards = []
+      this.nextLoadCards = null
+      this.lastLoadCard = null
     },
-    // フィルターのパターンによって異なるスナップショットを取得
-    async getFilteredCardsSnapshot() {
-      let result = this.$firestore.collection('Cards')
-      if (this.unitNameFilter) {
-        result = result.where('unitName', '==', this.unitNameFilter)
-      }
-      if (this.symbolFilter) {
-        result = result.where('symbols', 'array-contains', this.symbolFilter)
-      }
-      if (this.sortieCostFilter) {
-        result = result.where('sortie_cost', '==', this.sortieCostFilter)
-      }
-      if (this.lastFilteredCard) {
-        result = result.startAfter(this.lastFilteredCard)
-      }
-      result = await result.limit(10).get()
-      this.nextFilteredCards = result
-    },
-    // 無限スクロールのために、最後に表示されているカードのスナップショットを取得しておく
-    setLastFilteredCard() {
-      this.lastFilteredCard = this.nextFilteredCards.docs[
-        this.nextFilteredCards.size - 1
-      ]
-    },
-    // 取得した次に表示するカードのスナップショットのデータをクライアントサイドジョインののちに表示
-    displayCards() {
-      const result = this.nextFilteredCards.docs.map((doc) => {
-        const card = doc.data()
-        card.color = this.$color(card.symbols)
-        card.gradaton = this.$gradation(card.symbols)
-        card.imageUrl = this.$imageUrl(card.id, card.recording)
-        return card
-      })
-      result.forEach((card) => {
-        this.filteredCards.push(card)
-      })
-      return result
-    },
-    checkDoubleSymbol(symbols) {
-      switch (symbols[1]) {
-        case '聖痕':
-          return 'red-blue'
-        case '暗夜':
-          return 'black-white'
-        default:
-          return null
-      }
-    },
-    // サーチ無限スクロール
-    filteredCardsInfiniteHandler($state) {
-      setTimeout(async () => {
-        await this.getFilteredCardsSnapshot()
-        await this.setLastFilteredCard()
-        await this.displayCards()
-        // 取得したカードが10未満ならスクロール終了
-        if (this.nextFilteredCards.size <= 9) {
-          $state.complete()
-        } else {
-          $state.loaded()
-        }
-      }, 100)
-    },
-    // TODOマーク無限スクロール
-    keepCardsInfiniteHandler($state) {
-      setTimeout(async () => {
-        await this.getFilteredCardsSnapshot()
-        await this.setLastFilteredCard()
-        await this.displayCards()
-        // 取得したカードが10未満ならスクロール終了
-        if (this.nextFilteredCards.size < 10) {
-          $state.complete()
-        } else {
-          $state.loaded()
-        }
-      }, 100)
-    },
-    // ▲ 検索ドロワーに関するメソッド ****************************************▲
-    filterObject(item, queryText, itemText) {
+    checkUnitName(item, queryText, itemText) {
       return (
         item.name
           .toLocaleLowerCase()
@@ -553,8 +479,74 @@ export default {
         item.etc.toLocaleLowerCase().startsWith(queryText.toLocaleLowerCase())
       )
     },
+    // フィルターのパターンによって異なるスナップショットを取得
+    async getNextLoadCardsSnapshot() {
+      let result = this.$firestore.collection('Cards')
+      if (this.unitNameFilter) {
+        result = result.where('unitName', '==', this.unitNameFilter)
+      }
+      if (this.symbolFilter) {
+        result = result.where('symbols', 'array-contains', this.symbolFilter)
+      }
+      if (this.sortieCostFilter) {
+        result = result.where('sortie_cost', '==', this.sortieCostFilter)
+      }
+      if (this.lastLoadCard) {
+        result = result.startAfter(this.lastLoadCard)
+      }
+      result = await result.limit(10).get()
+      this.nextLoadCards = result
+    },
+    // 無限スクロールのために、最後に表示されているカードのスナップショットを取得しておく
+    setLastLoadCard() {
+      this.lastLoadCard = this.nextLoadCards.docs[this.nextLoadCards.size - 1]
+    },
+    // 取得した次に表示するカードのスナップショットのデータをクライアントサイドジョインののちに表示
+    displayNextLoadCards() {
+      const result = this.nextLoadCards.docs.map((doc) => {
+        const card = doc.data()
+        card.color = this.$color(card.symbols)
+        card.gradaton = this.$gradation(card.symbols)
+        card.imageUrl = this.$imageUrl(card.id, card.recording)
+        return card
+      })
+      result.forEach((card) => {
+        this.searchedCards.push(card)
+      })
+      return result
+    },
+    // サーチ無限スクロール
+    searchedCardsInfiniteHandler($state) {
+      setTimeout(async () => {
+        await this.getNextLoadCardsSnapshot()
+        await this.setLastLoadCard()
+        await this.displayNextLoadCards()
+        // 取得したカードが10未満ならスクロール終了
+        if (this.nextLoadCards.size <= 9) {
+          $state.complete()
+        } else {
+          $state.loaded()
+        }
+      }, 100)
+    },
+    // TODOマーク無限スクロール
+    keepCardsInfiniteHandler($state) {
+      setTimeout(async () => {
+        await this.getNextLoadCardsSnapshot()
+        await this.setLastLoadCard()
+        await this.displayNextLoadCards()
+        // 取得したカードが10未満ならスクロール終了
+        if (this.nextLoadCards.size < 10) {
+          $state.complete()
+        } else {
+          $state.loaded()
+        }
+      }, 100)
+    },
+    // ▲ 検索ドロワーに関するメソッド ****************************************▲
+
     // TODOisMarked(card) {
-    //   const result = this.myDeckCards.filter((myDeckCard) => {
+    //   const result = this.useCards.filter((myDeckCard) => {
     //     return card
     //   })
     //   if (result.length !== 0) {
@@ -578,14 +570,14 @@ export default {
         count: 1,
       }
 
-      const cardExists = this.myDeckCards.filter((useCard) => {
+      const cardExists = this.useCards.filter((useCard) => {
         return useCard.info.id === result.info.id
       })
       if (cardExists.length === 0) {
-        this.myDeckCards.push(result)
+        this.useCards.push(result)
       } else {
-        const i = this.myDeckCards.indexOf(cardExists[0])
-        this.myDeckCards[i].count++
+        const i = this.useCards.indexOf(cardExists[0])
+        this.useCards[i].count++
       }
     },
     addFourCards(card) {
@@ -595,9 +587,9 @@ export default {
     },
     removeCard(card) {
       card.count--
-      const i = this.myDeckCards.indexOf(card)
+      const i = this.useCards.indexOf(card)
       if (card.count === 0) {
-        this.myDeckCards.splice(i, 1)
+        this.useCards.splice(i, 1)
       }
     },
   },
