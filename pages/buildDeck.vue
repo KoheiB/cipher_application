@@ -54,7 +54,7 @@
       <!--▲ シンボル/出撃コストフィルター ****************************************▲-->
 
       <!--▼ タブ選択画面 ****************************************▼-->
-      <v-tabs v-model="tab" grow height="8vh">
+      <v-tabs v-model="tab" grow height="45px">
         <v-tab style="max-width: 50%"
           ><v-icon class="pr-1">mdi-cards</v-icon>Search</v-tab
         >
@@ -71,7 +71,7 @@
             class="py-0 overflow-y-auto"
             :height="
               // eslint-disable-next-line prettier/prettier
-              $vuetify.breakpoint.mobile ? 'calc(92vh - 120px)' : 'calc(92vh - 120px - 48px)'
+              $vuetify.breakpoint.mobile ? 'calc(100vh - 165px)' : 'calc(100vh - 165px - 48px)'
             "
             outlined
           >
