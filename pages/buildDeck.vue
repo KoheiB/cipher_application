@@ -44,7 +44,7 @@
           v-model="sortieCostFilter"
           :items="sortieCostItems"
           style="width: 40%; padding-left: 1px"
-          label="出撃"
+          label="コスト"
           dense
           clearable
           outlined
