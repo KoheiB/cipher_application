@@ -8,7 +8,10 @@
     <v-list-item-avatar class="ma-0 mr-2" tile height="38" width="72">
       <v-img :src="imageUrl" position="top" />
     </v-list-item-avatar>
-    <v-list-item-content class="card-info py-0 d-flex flex-nowrap">
+    <v-list-item-content
+      class="card-info py-0 d-flex flex-nowrap"
+      style="height: 38px"
+    >
       <v-row class="mx-0">
         <v-col cols="10" class="py-0" align-self="center">
           <v-list-item-title>
