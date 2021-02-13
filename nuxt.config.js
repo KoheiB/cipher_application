@@ -24,6 +24,7 @@ export default {
     { src: '~/plugins/firebase', ssr: false },
     { src: '~/plugins/auth', ssr: false },
     { src: '~/plugins/infiniteloading', ssr: false },
+    { src: '~/plugins/global', ssr: false },
   ],
 
   // Auto import components (https://go.nuxtjs.dev/config-components)
