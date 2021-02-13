@@ -10,7 +10,7 @@
       :mobile-breakpoint="$vuetify.breakpoint.mobileBreakpoint"
     >
       <!--▼ ユニット名フィルター ****************************************▼-->
-      <v-container class="pb-0 pt-4" style="height: 10vh; max-height: 60px">
+      <v-container class="pb-0 pt-4" style="height: 60px">
         <v-autocomplete
           v-model="unitNameFilter"
           :items="unitNameItems"
@@ -28,10 +28,7 @@
       <!--▲ ユニット名フィルター ****************************************▲-->
 
       <!--▼ シンボル/出撃コストフィルター ****************************************▼-->
-      <v-container
-        class="pb-0 pt-4 d-flex"
-        style="height: 10vh; max-height: 60px"
-      >
+      <v-container class="pb-0 pt-4 d-flex" style="height: 60px">
         <v-select
           v-model="symbolFilter"
           :items="symbolItems"
@@ -57,7 +54,7 @@
       <!--▲ シンボル/出撃コストフィルター ****************************************▲-->
 
       <!--▼ タブ選択画面 ****************************************▼-->
-      <v-tabs v-model="tab" grow height="5vh">
+      <v-tabs v-model="tab" grow height="8vh">
         <v-tab style="max-width: 50%"
           ><v-icon class="pr-1">mdi-cards</v-icon>Search</v-tab
         >
@@ -74,7 +71,7 @@
             class="py-0 overflow-y-auto"
             :height="
               // eslint-disable-next-line prettier/prettier
-              $vuetify.breakpoint.mobile ? '75vh' : 'calc(75vh - 48px)'
+              $vuetify.breakpoint.mobile ? 'calc(92vh - 120px)' : 'calc(92vh - 120px - 48px)'
             "
             outlined
           >
@@ -522,7 +519,7 @@ export default {
         await this.setLastLoadCard()
         await this.displayNextLoadCards()
         // 取得したカードが10未満ならスクロール終了
-        if (this.nextLoadCards.size <= 9) {
+        if (this.nextLoadCards.size < 10) {
           $state.complete()
         } else {
           $state.loaded()
