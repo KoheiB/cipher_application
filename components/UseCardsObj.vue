@@ -3,8 +3,9 @@
     class="px-0 mr-8 ml-2"
     :class="color"
     style="margin-bottom: 1px; min-height: 38px"
-    @click="$emit('card-list-click')"
+    @click="overlay = !overlay"
   >
+    <!-- @click="$emit('card-list-click')" -->
     <v-list-item-avatar class="ma-0 mr-2" tile height="38" width="72">
       <v-img :src="imageUrl" position="top" />
     </v-list-item-avatar>
@@ -29,6 +30,7 @@
         </v-col>
       </v-row>
     </v-list-item-content>
+    <v-overlay absolute :value="overlay"></v-overlay>
   </v-list-item>
 </template>
 
@@ -63,6 +65,11 @@ export default {
       type: Number,
       required: true,
     },
+  },
+  data() {
+    return {
+      overlay: false,
+    }
   },
 }
 </script>
