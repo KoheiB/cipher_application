@@ -263,7 +263,8 @@
           :gradation="card.info.gradation"
           :image-url="card.info.imageUrl"
           :count="card.count"
-          @card-list-click="removeCard(card)"
+          @plus-btn-click="card.count++"
+          @minus-btn-click="removeCard(card)"
         >
         </UseCardsObj>
       </draggable>

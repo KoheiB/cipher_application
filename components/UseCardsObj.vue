@@ -3,6 +3,7 @@
     class="px-0 mr-8 ml-2"
     :class="color"
     style="margin-bottom: 1px; min-height: 38px"
+    :ripple="false"
     @click="overlay = !overlay"
   >
     <!-- @click="$emit('card-list-click')" -->
@@ -30,7 +31,14 @@
         </v-col>
       </v-row>
     </v-list-item-content>
-    <v-overlay absolute :value="overlay"></v-overlay>
+    <v-overlay absolute :value="overlay">
+      <v-btn height="30" rounded @click.stop="$emit('minus-btn-click')">
+        <v-icon>mdi-minus</v-icon>
+      </v-btn>
+      <v-btn height="30" rounded @click.stop="$emit('plus-btn-click')"
+        ><v-icon>mdi-plus</v-icon></v-btn
+      >
+    </v-overlay>
   </v-list-item>
 </template>
 
@@ -70,6 +78,14 @@ export default {
     return {
       overlay: false,
     }
+  },
+  methods: {
+    plus() {
+      console.log('plus')
+    },
+    minus() {
+      console.log('minus')
+    },
   },
 }
 </script>
