@@ -132,7 +132,6 @@
               ></v-divider>
             </template>
             <infinite-loading
-              ref="searchedCardsInfiniteLoading"
               spinner="spiral"
               :identifier="searchInfiniteId"
               @infinite="searchedCardsInfiniteHandler"
@@ -197,7 +196,6 @@
               ></v-divider>
             </template>
             <!-- TODO<infinite-loading
-              ref="keepCardsInfiniteLoading"
               spinner="spiral"
               @infinite="keepCardsInfiniteHandler"
             >
