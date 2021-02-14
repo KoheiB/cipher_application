@@ -21,7 +21,7 @@
           dense
           clearable
           outlined
-          @change="searchCards()"
+          @change="resetSearchLoading()"
         >
         </v-autocomplete>
       </v-container>
@@ -38,7 +38,7 @@
           dense
           clearable
           outlined
-          @change="searchCards()"
+          @change="resetSearchLoading()"
         />
         <v-select
           v-model="sortieCostFilter"
@@ -48,7 +48,7 @@
           dense
           clearable
           outlined
-          @change="searchCards()"
+          @change="resetSearchLoading()"
         />
       </v-container>
       <!--▲ シンボル/出撃コストフィルター ****************************************▲-->
@@ -71,7 +71,9 @@
             class="py-0 overflow-y-auto"
             :height="
               // eslint-disable-next-line prettier/prettier
-              $vuetify.breakpoint.mobile ? 'calc(100vh - 165px)' : 'calc(100vh - 165px - 48px)'
+              $vuetify.breakpoint.mobile
+                ? 'calc(100vh - 165px)'
+                : 'calc(100vh - 165px - 48px)'
             "
             outlined
           >
@@ -132,6 +134,7 @@
             <infinite-loading
               ref="searchedCardsInfiniteLoading"
               spinner="spiral"
+              :identifier="searchInfiniteId"
               @infinite="searchedCardsInfiniteHandler"
             >
               <span slot="no-more"></span>
@@ -305,8 +308,10 @@ export default {
       searchedCards: [],
 
       // ページネーション
-      nextLoadCards: null,
-      lastLoadCard: null,
+      nextLoadSearchedCards: null,
+      lastLoadSearchedCard: null,
+      searchInfiniteId: +new Date(),
+      keepInfiniteId: +new Date(),
 
       // ユニット名フィルター
       unitNameFilter: undefined,
@@ -340,7 +345,6 @@ export default {
   methods: {
     saveDeck() {
       if (this.useCardsRef === '') {
-        console.log('ref')
         this.useCardsRef = this.$firestore
           .collection('Users')
           .doc()
@@ -453,17 +457,11 @@ export default {
 
     // ▼ 検索ドロワーに関するメソッド ****************************************▼
     // フィルターを変更した時の処理
-    async searchCards() {
-      await this.resetFilter()
-      await this.getNextLoadCardsSnapshot()
-      await this.setLastLoadCard()
-      await this.displayNextLoadCards()
-      await this.$refs.searchedCardsInfiniteLoading.stateChanger.reset()
-    },
-    resetFilter() {
+    resetSearchLoading() {
+      this.searchInfiniteId += 1
       this.searchedCards = []
-      this.nextLoadCards = null
-      this.lastLoadCard = null
+      this.nextLoadSearchedCards = null
+      this.lastLoadSearchedCard = null
     },
     checkUnitName(item, queryText, itemText) {
       return (
@@ -488,19 +486,21 @@ export default {
       if (this.sortieCostFilter) {
         result = result.where('sortie_cost', '==', this.sortieCostFilter)
       }
-      if (this.lastLoadCard) {
-        result = result.startAfter(this.lastLoadCard)
+      if (this.lastLoadSearchedCard) {
+        result = result.startAfter(this.lastLoadSearchedCard)
       }
       result = await result.limit(10).get()
-      this.nextLoadCards = result
+      this.nextLoadSearchedCards = result
     },
     // 無限スクロールのために、最後に表示されているカードのスナップショットを取得しておく
     setLastLoadCard() {
-      this.lastLoadCard = this.nextLoadCards.docs[this.nextLoadCards.size - 1]
+      this.lastLoadSearchedCard = this.nextLoadSearchedCards.docs[
+        this.nextLoadSearchedCards.size - 1
+      ]
     },
     // 取得した次に表示するカードのスナップショットのデータをクライアントサイドジョインののちに表示
     displayNextLoadCards() {
-      const result = this.nextLoadCards.docs.map((doc) => {
+      const result = this.nextLoadSearchedCards.docs.map((doc) => {
         const card = doc.data()
         card.color = this.$color(card.symbols)
         card.gradaton = this.$gradation(card.symbols)
@@ -519,10 +519,10 @@ export default {
         await this.setLastLoadCard()
         await this.displayNextLoadCards()
         // 取得したカードが10未満ならスクロール終了
-        if (this.nextLoadCards.size < 10) {
-          $state.complete()
+        if (this.nextLoadSearchedCards.size < 10) {
+          await $state.complete()
         } else {
-          $state.loaded()
+          await $state.loaded()
         }
       }, 100)
     },
@@ -533,7 +533,7 @@ export default {
         await this.setLastLoadCard()
         await this.displayNextLoadCards()
         // 取得したカードが10未満ならスクロール終了
-        if (this.nextLoadCards.size < 10) {
+        if (this.nextLoadSearchedCards.size < 10) {
           $state.complete()
         } else {
           $state.loaded()
