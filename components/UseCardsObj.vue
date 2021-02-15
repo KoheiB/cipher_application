@@ -4,7 +4,7 @@
     :class="color"
     style="margin-bottom: 1px; min-height: 38px"
     :ripple="false"
-    @click="overlay = !overlay"
+    @click="$emit('card-list-click', cardId)"
   >
     <!-- @click="$emit('card-list-click')" -->
     <v-list-item-avatar class="ma-0 mr-2" tile height="38" width="72">
@@ -31,12 +31,28 @@
         </v-col>
       </v-row>
     </v-list-item-content>
-    <v-overlay absolute :value="overlay">
-      <v-btn height="30" rounded @click.stop="$emit('minus-btn-click')">
-        <v-icon>mdi-minus</v-icon>
+    <v-overlay absolute :value="isOverlay">
+      <v-btn
+        class="blue-grey lighten-5"
+        rounded
+        small
+        @click.stop="$emit('minus-btn-click')"
+      >
+        <v-icon color="red accent-4">mdi-minus</v-icon>
       </v-btn>
-      <v-btn height="30" rounded @click.stop="$emit('plus-btn-click')"
-        ><v-icon>mdi-plus</v-icon></v-btn
+      <v-btn
+        class="blue-grey darken-4"
+        style="text-transform: none"
+        height="30"
+        :ripple="false"
+        ><span style="font-size: 16px">x{{ count }}</span></v-btn
+      >
+      <v-btn
+        class="blue-grey lighten-5"
+        rounded
+        small
+        @click.stop="$emit('plus-btn-click')"
+        ><v-icon color="light-blue accent-4">mdi-plus</v-icon></v-btn
       >
     </v-overlay>
   </v-list-item>
@@ -45,6 +61,10 @@
 <script>
 export default {
   props: {
+    cardId: {
+      type: String,
+      required: true,
+    },
     title: {
       type: String,
       required: true,
@@ -73,18 +93,15 @@ export default {
       type: Number,
       required: true,
     },
-  },
-  data() {
-    return {
-      overlay: false,
-    }
-  },
-  methods: {
-    plus() {
-      console.log('plus')
+    overlayId: {
+      type: String,
+      required: false,
+      default: null,
     },
-    minus() {
-      console.log('minus')
+  },
+  computed: {
+    isOverlay() {
+      return this.cardId === this.overlayId
     },
   },
 }

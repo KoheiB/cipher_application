@@ -71,7 +71,9 @@
             class="py-0 overflow-y-auto"
             :height="
               // eslint-disable-next-line prettier/prettier
-              $vuetify.breakpoint.mobile ? 'calc(100vh - 165px)' : 'calc(100vh - 165px - 48px)'
+              $vuetify.breakpoint.mobile
+                ? 'calc(100vh - 165px)'
+                : 'calc(100vh - 165px - 48px)'
             "
             outlined
           >
@@ -223,7 +225,9 @@
         >
         <v-btn class="info" width="25%" tile @click="saveDeck">保存</v-btn>
         <v-btn class="info" width="25%" tile @click="loadDeck">ロード</v-btn>
-        <v-btn width="25%" tile @click="drawer = !drawer">ドロワー</v-btn>
+        <v-btn width="25%" tile @click=";(drawer = !drawer), (overlayId = null)"
+          >ドロワー</v-btn
+        >
       </v-layout>
     </v-container>
     <draggable
@@ -253,9 +257,10 @@
         @change="onMoveCard"
       >
         <UseCardsObj
-          v-for="(card, index) in useCards"
-          :key="2 + index"
+          v-for="card in useCards"
+          :key="2 + card.info.id"
           class="d-mobile-none"
+          :card-id="card.info.id"
           :title="card.info.title"
           :unit-name="card.info.unitName"
           :symbols="card.info.symbols"
@@ -263,8 +268,10 @@
           :gradation="card.info.gradation"
           :image-url="card.info.imageUrl"
           :count="card.count"
+          :overlay-id="overlayId"
           @plus-btn-click="card.count++"
           @minus-btn-click="removeCard(card)"
+          @card-list-click="changeCardCount"
         >
         </UseCardsObj>
       </draggable>
@@ -297,6 +304,7 @@ export default {
       useCards: [],
       keepCards: [],
       useCardsRef: '',
+      overlayId: null,
 
       // UIコンポーネント関連
       drawer: null,
@@ -588,6 +596,14 @@ export default {
       const i = this.useCards.indexOf(card)
       if (card.count === 0) {
         this.useCards.splice(i, 1)
+        this.overlayId = null
+      }
+    },
+    changeCardCount(id) {
+      if (this.overlayId === id) {
+        this.overlayId = null
+      } else {
+        this.overlayId = id
       }
     },
   },
