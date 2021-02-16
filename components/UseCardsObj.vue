@@ -33,7 +33,7 @@
     </v-list-item-content>
     <v-overlay absolute :value="isOverlay">
       <v-btn
-        class="blue-grey lighten-5"
+        color="blue-grey lighten-5"
         rounded
         small
         @click.stop="$emit('minus-btn-click')"
@@ -41,14 +41,14 @@
         <v-icon color="red accent-4">mdi-minus</v-icon>
       </v-btn>
       <v-btn
-        class="blue-grey darken-4"
+        color="blue-grey darken-4"
         style="text-transform: none"
         height="30"
         :ripple="false"
         ><span style="font-size: 16px">x{{ count }}</span></v-btn
       >
       <v-btn
-        class="blue-grey lighten-5"
+        color="blue-grey lighten-5"
         rounded
         small
         @click.stop="$emit('plus-btn-click')"
