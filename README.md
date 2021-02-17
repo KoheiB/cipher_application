@@ -7,13 +7,12 @@ TCG『ファイアーエムブレムサイファ』のデッキ管理アプリ�
 
 このアプリが今後のサイファプレイヤー間の交流の一助となることを願っています。
 
-![search](https://user-images.githubusercontent.com/60537225/108232710-6345b080-7186-11eb-941d-f3e703e401bd.mov)
-# Demo
-## https://my-matching-app-c1796.web.app/
+![Search](https://user-images.githubusercontent.com/60537225/108236289-1532ac00-718a-11eb-9522-d0af1ee1baa8.gif)
 
 # Installation/Usage
+開発中につき、未デプロイです。
 
-`$ git clone https://github.com/KoheiB/my-matching-app.git`
+`$ git clone https://github.com/KoheiB/cipher_application.git`
 
 `$ npm run dev`
 
@@ -42,6 +41,7 @@ TCG『ファイアーエムブレムサイファ』のデッキ管理アプリ�
 - 投稿されたレシピをいいねする機能
 - デッキ価格計算補助機能
 - 大会運営用機能（使用カード集計等）
+
 # Technology
 
 - JavaScript Framework: Nuxt.js(v2.14.12)
@@ -61,5 +61,5 @@ TCG『ファイアーエムブレムサイファ』のデッキ管理アプリ�
 - [Github](https://github.com/KoheiB)
 - [Twitter](https://twitter.com/KoheiB1)
 - [Qiita](https://qiita.com/kou74)
-
 ## buruso3
+- [Twitter](https://twitter.com/buruso3)
