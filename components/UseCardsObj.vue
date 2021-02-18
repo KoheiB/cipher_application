@@ -14,9 +14,9 @@
     </div>
     <v-list-item-content class="py-0 d-flex flex-nowrap" style="height: 38px">
       <v-list-item-title>
-        <span class="list-title">{{ title }}</span>
+        <span class="list-title font-weight-bold">{{ title }}</span>
         <br />
-        <span class="list-unit-name">{{ unitName }}</span>
+        <span class="list-unit-name font-weight-bold">{{ unitName }}</span>
       </v-list-item-title>
     </v-list-item-content>
     <v-list-item-avatar class="ma-0" tile height="38" width="72">
