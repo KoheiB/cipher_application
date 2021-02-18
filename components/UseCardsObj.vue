@@ -6,31 +6,30 @@
     :ripple="false"
     @click="$emit('card-list-click', cardId)"
   >
-    <!-- @click="$emit('card-list-click')" -->
-    <v-list-item-avatar class="ma-0 mr-2" tile height="38" width="72">
-      <v-img :src="imageUrl" position="top" />
-    </v-list-item-avatar>
-    <v-list-item-content
-      class="card-info py-0 d-flex flex-nowrap"
-      style="height: 38px"
+    <div
+      class="px-0 mx-1 blue-grey darken-3 white--text font-weight-bold rounded-xl d-flex justify-center align-center"
+      style="width: 30px; height: 30px"
     >
-      <v-row class="mx-0">
-        <v-col cols="10" class="py-0" align-self="center">
-          <v-list-item-title>
-            <span class="list-title">{{ title }}</span>
-            <br />
-            <span class="list-unit-name">{{ unitName }}</span>
-          </v-list-item-title>
-        </v-col>
-        <v-col
-          cols="2"
-          class="px-0 blue-grey darken-4 white--text font-weight-bold text-center"
-          style="height: 38px; padding-top: 11px"
-        >
-          <span style="font-size: 16px; margin-right: 2px">x</span>{{ count }}
-        </v-col>
-      </v-row>
+      <span style="font-size: 16px">{{ sortieCost }}</span>
+    </div>
+    <v-list-item-content class="py-0 d-flex flex-nowrap" style="height: 38px">
+      <v-list-item-title>
+        <span class="list-title">{{ title }}</span>
+        <br />
+        <span class="list-unit-name">{{ unitName }}</span>
+      </v-list-item-title>
     </v-list-item-content>
+    <v-list-item-avatar class="ma-0" tile height="38" width="72">
+      <v-img :src="imageUrl" position="top">
+        <div class="fill-height red-gradation" />
+      </v-img>
+    </v-list-item-avatar>
+    <div
+      class="px-0 blue-grey darken-4 white--text font-weight-bold d-flex justify-center align-center"
+      style="height: 38px; width: 38px"
+    >
+      <span style="font-size: 16px">x{{ count }}</span>
+    </div>
     <v-overlay absolute :value="isOverlay">
       <v-btn
         color="blue-grey lighten-5"
@@ -85,6 +84,10 @@ export default {
       type: String,
       required: true,
     },
+    sortieCost: {
+      type: String,
+      required: true,
+    },
     imageUrl: {
       type: String,
       required: true,
@@ -114,5 +117,12 @@ export default {
 }
 .list-unit-name {
   font-size: 0.875rem;
+}
+.red-gradation {
+  background-image: linear-gradient(
+    90deg,
+    rgb(109, 213, 208) 30%,
+    rgba(109, 213, 208, 0) 70%
+  );
 }
 </style>
