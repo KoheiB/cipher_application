@@ -13,7 +13,7 @@
                   :src="require('@/static/img/B13/B13-005N.png')"
                   max-height="70%"
                   position="top"
-                ></v-img>
+                />
                 <v-card-title
                   >紫無リン 〜ニニアンテティスを添えて〜</v-card-title
                 >

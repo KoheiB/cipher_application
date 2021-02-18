@@ -22,8 +22,7 @@
           clearable
           outlined
           @change="searchCards()"
-        >
-        </v-autocomplete>
+        />
       </v-container>
       <!--▲ ユニット名フィルター ****************************************▲-->
 
@@ -71,7 +70,9 @@
             class="py-0 overflow-y-auto"
             :height="
               // eslint-disable-next-line prettier/prettier
-              $vuetify.breakpoint.mobile ? 'calc(100vh - 165px)' : 'calc(100vh - 165px - 48px)'
+              $vuetify.breakpoint.mobile
+                ? 'calc(100vh - 165px)'
+                : 'calc(100vh - 165px - 48px)'
             "
             outlined
           >
@@ -91,11 +92,9 @@
                   <v-img :src="card.imageUrl" />
                 </v-list-item-avatar>
                 <v-list-item-content>
-                  <v-list-item-subtitle v-text="card.id"></v-list-item-subtitle>
-                  <v-list-item-subtitle
-                    v-text="card.title"
-                  ></v-list-item-subtitle>
-                  <v-list-item-title v-text="card.unitName"></v-list-item-title>
+                  <v-list-item-subtitle v-text="card.id" />
+                  <v-list-item-subtitle v-text="card.title" />
+                  <v-list-item-title v-text="card.unitName" />
                 </v-list-item-content>
                 <v-list-item-action class="d-flex flex-column">
                   <v-btn
@@ -124,18 +123,15 @@
                   </v-btn>
                 </v-list-item-action>
               </v-list-item>
-              <v-divider
-                v-if="index < searchedCards.length - 1"
-                :key="index"
-              ></v-divider>
+              <v-divider v-if="index < searchedCards.length - 1" :key="index" />
             </template>
             <infinite-loading
               ref="searchedCardsInfiniteLoading"
               spinner="spiral"
               @infinite="searchedCardsInfiniteHandler"
             >
-              <span slot="no-more"></span>
-              <span slot="no-results"></span>
+              <span slot="no-more" />
+              <span slot="no-results" />
             </infinite-loading>
           </v-list>
         </v-tab-item>
@@ -160,11 +156,9 @@
                   <v-img :src="card.imageUrl" />
                 </v-list-item-avatar>
                 <v-list-item-content>
-                  <v-list-item-subtitle v-text="card.id"></v-list-item-subtitle>
-                  <v-list-item-subtitle
-                    v-text="card.title"
-                  ></v-list-item-subtitle>
-                  <v-list-item-title v-text="card.unitName"></v-list-item-title>
+                  <v-list-item-subtitle v-text="card.id" />
+                  <v-list-item-subtitle v-text="card.title" />
+                  <v-list-item-title v-text="card.unitName" />
                 </v-list-item-content>
                 <v-list-item-action class="d-flex flex-column">
                   <v-btn
@@ -188,10 +182,7 @@
                   </v-btn>
                 </v-list-item-action>
               </v-list-item>
-              <v-divider
-                v-if="index < searchedCards.length - 1"
-                :key="index"
-              ></v-divider>
+              <v-divider v-if="index < searchedCards.length - 1" :key="index" />
             </template>
             <!-- TODO<infinite-loading
               ref="keepCardsInfiniteLoading"
@@ -209,13 +200,9 @@
     <!--▲ 検索ドロワー ****************************************▲-->
 
     <!--▼ メイン画面 ****************************************▼-->
-    <v-container class="">
+    <v-container>
       <v-form @submit.prevent>
-        <v-text-field
-          v-model="deckName"
-          type="text"
-          label="deckName"
-        ></v-text-field>
+        <v-text-field v-model="deckName" type="text" label="deckName" />
       </v-form>
       <v-layout class="d-flex align-center">
         <v-btn class="primary" width="25%" tile @click="shareDeck"
@@ -223,7 +210,9 @@
         >
         <v-btn class="info" width="25%" tile @click="saveDeck">保存</v-btn>
         <v-btn class="info" width="25%" tile @click="loadDeck">ロード</v-btn>
-        <v-btn width="25%" tile @click="drawer = !drawer">ドロワー</v-btn>
+        <v-btn width="25%" tile @click=";(drawer = !drawer), (overlayId = null)"
+          >ドロワー</v-btn
+        >
       </v-layout>
     </v-container>
     <draggable
@@ -253,26 +242,30 @@
         @change="onMoveCard"
       >
         <UseCardsObj
-          v-for="(card, index) in useCards"
-          :key="2 + index"
+          v-for="card in useCards"
+          :key="2 + card.info.id"
           class="d-mobile-none"
+          :card-id="card.info.id"
           :title="card.info.title"
           :unit-name="card.info.unitName"
           :symbols="card.info.symbols"
           :color="card.info.color"
           :gradation="card.info.gradation"
+          :sortie-cost="card.info.sortie_cost"
           :image-url="card.info.imageUrl"
           :count="card.count"
-          @card-list-click="removeCard(card)"
-        >
-        </UseCardsObj>
+          :overlay-id="overlayId"
+          @plus-btn-click="card.count++"
+          @minus-btn-click="removeCard(card)"
+          @card-list-click="changeCardCount"
+        />
       </draggable>
     </v-list>
     {{ useCards }}
     <!-- {{ myDeckCardView }} -->
-    <!-- <v-img :src="require('@/static/img/B01/B01-001SR.png')">
+    <v-img :src="require('@/static/img/B01/B01-001SR.png')">
       <div class="fill-height gradient"></div>
-    </v-img> -->
+    </v-img>
   </v-container>
   <!--▲ メイン画面 ****************************************▲-->
 </template>
@@ -296,6 +289,7 @@ export default {
       useCards: [],
       keepCards: [],
       useCardsRef: '',
+      overlayId: null,
 
       // UIコンポーネント関連
       drawer: null,
@@ -562,6 +556,7 @@ export default {
           symbols: card.symbols,
           color: this.$color(card.symbols),
           gradation: this.$gradation(card.symbols),
+          sortie_cost: card.sortie_cost,
           imageUrl: this.$imageUrl(card.id, card.recording),
         },
         count: 1,
@@ -587,6 +582,14 @@ export default {
       const i = this.useCards.indexOf(card)
       if (card.count === 0) {
         this.useCards.splice(i, 1)
+        this.overlayId = null
+      }
+    },
+    changeCardCount(id) {
+      if (this.overlayId === id) {
+        this.overlayId = null
+      } else {
+        this.overlayId = id
       }
     },
   },
@@ -610,11 +613,11 @@ export default {
     rgba(245, 245, 245, 1) 60%
   );
 }
-/* .gradient {
-  background-imageUrl: linear-gradient(
+.gradient {
+  background-image: linear-gradient(
     90deg,
     rgb(109, 213, 208) 30%,
     rgba(109, 213, 208, 0) 70%
   );
-} */
+}
 </style>
