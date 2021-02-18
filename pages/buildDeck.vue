@@ -22,8 +22,7 @@
           clearable
           outlined
           @change="searchCards()"
-        >
-        </v-autocomplete>
+        />
       </v-container>
       <!--▲ ユニット名フィルター ****************************************▲-->
 
@@ -93,11 +92,9 @@
                   <v-img :src="card.imageUrl" />
                 </v-list-item-avatar>
                 <v-list-item-content>
-                  <v-list-item-subtitle v-text="card.id"></v-list-item-subtitle>
-                  <v-list-item-subtitle
-                    v-text="card.title"
-                  ></v-list-item-subtitle>
-                  <v-list-item-title v-text="card.unitName"></v-list-item-title>
+                  <v-list-item-subtitle v-text="card.id" />
+                  <v-list-item-subtitle v-text="card.title" />
+                  <v-list-item-title v-text="card.unitName" />
                 </v-list-item-content>
                 <v-list-item-action class="d-flex flex-column">
                   <v-btn
@@ -126,18 +123,15 @@
                   </v-btn>
                 </v-list-item-action>
               </v-list-item>
-              <v-divider
-                v-if="index < searchedCards.length - 1"
-                :key="index"
-              ></v-divider>
+              <v-divider v-if="index < searchedCards.length - 1" :key="index" />
             </template>
             <infinite-loading
               ref="searchedCardsInfiniteLoading"
               spinner="spiral"
               @infinite="searchedCardsInfiniteHandler"
             >
-              <span slot="no-more"></span>
-              <span slot="no-results"></span>
+              <span slot="no-more" />
+              <span slot="no-results" />
             </infinite-loading>
           </v-list>
         </v-tab-item>
@@ -162,11 +156,9 @@
                   <v-img :src="card.imageUrl" />
                 </v-list-item-avatar>
                 <v-list-item-content>
-                  <v-list-item-subtitle v-text="card.id"></v-list-item-subtitle>
-                  <v-list-item-subtitle
-                    v-text="card.title"
-                  ></v-list-item-subtitle>
-                  <v-list-item-title v-text="card.unitName"></v-list-item-title>
+                  <v-list-item-subtitle v-text="card.id" />
+                  <v-list-item-subtitle v-text="card.title" />
+                  <v-list-item-title v-text="card.unitName" />
                 </v-list-item-content>
                 <v-list-item-action class="d-flex flex-column">
                   <v-btn
@@ -190,10 +182,7 @@
                   </v-btn>
                 </v-list-item-action>
               </v-list-item>
-              <v-divider
-                v-if="index < searchedCards.length - 1"
-                :key="index"
-              ></v-divider>
+              <v-divider v-if="index < searchedCards.length - 1" :key="index" />
             </template>
             <!-- TODO<infinite-loading
               ref="keepCardsInfiniteLoading"
@@ -211,13 +200,9 @@
     <!--▲ 検索ドロワー ****************************************▲-->
 
     <!--▼ メイン画面 ****************************************▼-->
-    <v-container class="">
+    <v-container>
       <v-form @submit.prevent>
-        <v-text-field
-          v-model="deckName"
-          type="text"
-          label="deckName"
-        ></v-text-field>
+        <v-text-field v-model="deckName" type="text" label="deckName" />
       </v-form>
       <v-layout class="d-flex align-center">
         <v-btn class="primary" width="25%" tile @click="shareDeck"
@@ -272,8 +257,7 @@
           @plus-btn-click="card.count++"
           @minus-btn-click="removeCard(card)"
           @card-list-click="changeCardCount"
-        >
-        </UseCardsObj>
+        />
       </draggable>
     </v-list>
     {{ useCards }}

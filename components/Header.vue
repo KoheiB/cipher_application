@@ -2,7 +2,7 @@
   <v-app-bar app dense clipped-left>
     <v-toolbar-title>CipherApp</v-toolbar-title>
 
-    <v-spacer></v-spacer>
+    <v-spacer />
 
     <v-toolbar-items class="hidden-mobile-and-down">
       <v-btn-toggle borderless>
