@@ -71,7 +71,9 @@
             class="py-0 overflow-y-auto"
             :height="
               // eslint-disable-next-line prettier/prettier
-              $vuetify.breakpoint.mobile ? 'calc(100vh - 165px)' : 'calc(100vh - 165px - 48px)'
+              $vuetify.breakpoint.mobile
+                ? 'calc(100vh - 165px)'
+                : 'calc(100vh - 165px - 48px)'
             "
             outlined
           >
@@ -227,34 +229,32 @@
       </v-layout>
     </v-container>
     <draggable
-      v-model="useCards"
+      v-model="allUseCards"
       class="d-flex flex-wrap"
-      group="useCards"
+      group="allUseCards"
       :animation="200"
       @start="drag = true"
       @end="drag = false"
-      @change="onMoveCard"
+      @change="sortAllUseCards"
     >
-      <!-- <UseCards
-        v-for="(card, index) in myDeckCardView"
-        :key="index"
+      <UseCard
+        v-for="(card, index) in allUseCards"
+        :key="'allUseCard-' + card.id + '-' + index"
         class="hidden-mobile-and-down"
-        :image-url="card.info.imageUrl"
-      ></UseCards> -->
+        :image-url="card.imageUrl"
+      />
     </draggable>
     <v-list>
       <draggable
         v-model="useCards"
-        class=""
-        group="myDeckCardList"
+        group="useCards"
         :animation="200"
         @start="drag = true"
         @end="drag = false"
-        @change="onMoveCard"
       >
-        <UseCardsObj
-          v-for="(card, index) in useCards"
-          :key="2 + index"
+        <UseCardObj
+          v-for="card in useCards"
+          :key="'useCard-' + card.info.id"
           class="d-mobile-none"
           :title="card.info.title"
           :unit-name="card.info.unitName"
@@ -264,12 +264,11 @@
           :image-url="card.info.imageUrl"
           :count="card.count"
           @card-list-click="removeCard(card)"
-        >
-        </UseCardsObj>
+        />
       </draggable>
     </v-list>
     {{ useCards }}
-    <!-- {{ myDeckCardView }} -->
+    {{ allUseCards }}
     <!-- <v-img :src="require('@/static/img/B01/B01-001SR.png')">
       <div class="fill-height gradient"></div>
     </v-img> -->
@@ -294,6 +293,7 @@ export default {
     return {
       deckName: '',
       useCards: [],
+      allUseCards: [],
       keepCards: [],
       useCardsRef: '',
 
@@ -322,21 +322,6 @@ export default {
       // ▲ カード検索関連 ****************************************▲
     }
   },
-  // computed: {
-  //   myDeckCardView() {
-  //     const result = []
-  //     this.useCards.forEach((cardObject) => {
-  //       const card = {
-  //         id: cardObject.info.id,
-  //         imageUrl: cardObject.info.imageUrl,
-  //       }
-  //       for (let i = 0; i < cardObject.count; i++) {
-  //         result.push(card)
-  //       }
-  //     })
-  //     return result
-  //   },
-  // },
   methods: {
     saveDeck() {
       if (this.useCardsRef === '') {
@@ -394,7 +379,7 @@ export default {
     // ▼ マイデッキビューに関するメソッド ****************************************▼
     // 1枚のカードをドラッグした際、同じ種類のカードの順序をまとめて入れ替えるためのメソッド
     // 一旦、カードの配列を各カードの順序と枚数の情報に変換して並べなおす
-    onMoveCard(event) {
+    sortAllUseCards(event) {
       const newIndex = event.moved.newIndex
       const oldIndex = event.moved.oldIndex
 
@@ -402,49 +387,56 @@ export default {
         // 後ろにカードを移動した場合
         // 配列の順序をreverseして、末尾から探索できるようにしておく
         // これにより、ドラッグして移動したカードが元より後ろの順で検知される
-        this.useCards.reverse()
-
-        const cardObjects = this.toCardObjects(this.useCards)
-        this.useCards = this.toArrayCards(cardObjects)
+        this.allUseCards.reverse()
+        this.useCards = this.getNewUseCards(this.allUseCards)
+        this.allUseCards = this.getNewAllUseCards(this.useCards)
         // 逆順にしたものを元の順に戻す
-        this.useCards.reverse()
+        this.allUseCards.reverse()
       } else if (newIndex < oldIndex) {
         // 前にカードを移動した場合
-        const cardObjects = this.toCardObjects(this.useCards)
-        this.useCards = this.toArrayCards(cardObjects)
+        this.useCards = this.getNewUseCards(this.allUseCards)
+        this.allUseCards = this.getNewAllUseCards(this.useCards)
       }
     },
-    toCardObjects(cards) {
+    getNewAllUseCards(useCards) {
+      // 一覧で表示するカードの配列
+      const result = []
+
+      useCards.forEach((cardObj) => {
+        for (let i = 0; i < cardObj.count; ++i) {
+          result.push(cardObj.info)
+        }
+      })
+      return result
+    },
+    getNewUseCards(allUseCards) {
       // 各カードがどの順で何枚入っているかを格納する配列
       // obj{ img: String, count: Int}[]
       const result = []
 
       // カードの配列を頭から探索
-      cards.forEach((card) => {
+      allUseCards.forEach((card) => {
         // 種類順の配列(result)にあるカードかどうか、オブジェクトのimgキーを参照して確認する
-        const isCardInObjects = result.filter((obj) => obj.img === card)
+        const cardExists =
+          result.filter((cardObj) => {
+            if (cardObj) {
+              return cardObj.info.id === card.id
+            }
+          })[0] !== undefined
 
         // 種類順の配列に含まれているかどうか
-        if (isCardInObjects.length === 0) {
-          // 新規のカードの場合
+        if (!cardExists) {
+          // 含まれない：新規のカードの場合
           // カードのオブジェクトをresultに新規追加する
-          result.push({ img: card, count: 1 })
+          const cardObj = { info: card, count: 1 }
+          result.push(cardObj)
         } else {
-          // 既存のカードの場合
+          // 含まれる：既存のカードの場合
           // 該当のオブジェクトのcountを1増やす
-          const objectIndex = result.findIndex((obj) => obj.img === card)
-          result[objectIndex].count++
-        }
-      })
-      return result
-    },
-    toArrayCards(objects) {
-      // 一覧で表示するカードの配列
-      const result = []
-
-      objects.forEach((obj) => {
-        for (let i = 0; i < obj.count; ++i) {
-          result.push(obj.img)
+          const cardObjIndex = result.findIndex(
+            (cardObj) => cardObj.info.id === card.id
+          )
+          result[cardObjIndex].count++
         }
       })
       return result
@@ -567,15 +559,21 @@ export default {
         count: 1,
       }
 
-      const cardExists = this.useCards.filter((useCard) => {
-        return useCard.info.id === result.info.id
-      })
-      if (cardExists.length === 0) {
+      const cardExists =
+        this.useCards.filter((cardObj) => {
+          if (cardObj) {
+            return cardObj.info.id === result.info.id
+          }
+        })[0] !== undefined
+      if (!cardExists) {
         this.useCards.push(result)
       } else {
-        const i = this.useCards.indexOf(cardExists[0])
-        this.useCards[i].count++
+        const cardObjIndex = this.useCards.findIndex(
+          (cardObj) => cardObj.info.id === card.id
+        )
+        this.useCards[cardObjIndex].count++
       }
+      this.allUseCards = this.getNewAllUseCards(this.useCards)
     },
     addFourCards(card) {
       for (let i = 0; i < 4; i++) {
@@ -588,6 +586,7 @@ export default {
       if (card.count === 0) {
         this.useCards.splice(i, 1)
       }
+      this.allUseCards = this.getNewAllUseCards(this.useCards)
     },
   },
 }
