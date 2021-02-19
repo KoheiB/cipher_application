@@ -235,7 +235,7 @@
       :animation="200"
       @start="drag = true"
       @end="drag = false"
-      @change="sortAllUseCards"
+      @change="groupAllUseCards"
     >
       <UseCard
         v-for="(card, index) in allUseCards"
@@ -251,6 +251,7 @@
         :animation="200"
         @start="drag = true"
         @end="drag = false"
+        @change="sortAllUseCards"
       >
         <UseCardObj
           v-for="card in useCards"
@@ -267,8 +268,8 @@
         />
       </draggable>
     </v-list>
-    {{ useCards }}
-    {{ allUseCards }}
+    <!-- {{ useCards }} -->
+    <!-- {{ allUseCards }} -->
     <!-- <v-img :src="require('@/static/img/B01/B01-001SR.png')">
       <div class="fill-height gradient"></div>
     </v-img> -->
@@ -379,7 +380,7 @@ export default {
     // ▼ マイデッキビューに関するメソッド ****************************************▼
     // 1枚のカードをドラッグした際、同じ種類のカードの順序をまとめて入れ替えるためのメソッド
     // 一旦、カードの配列を各カードの順序と枚数の情報に変換して並べなおす
-    sortAllUseCards(event) {
+    groupAllUseCards(event) {
       const newIndex = event.moved.newIndex
       const oldIndex = event.moved.oldIndex
 
@@ -389,14 +390,20 @@ export default {
         // これにより、ドラッグして移動したカードが元より後ろの順で検知される
         this.allUseCards.reverse()
         this.useCards = this.getNewUseCards(this.allUseCards)
-        this.allUseCards = this.getNewAllUseCards(this.useCards)
+        this.sortAllUseCards()
         // 逆順にしたものを元の順に戻す
         this.allUseCards.reverse()
       } else if (newIndex < oldIndex) {
         // 前にカードを移動した場合
         this.useCards = this.getNewUseCards(this.allUseCards)
-        this.allUseCards = this.getNewAllUseCards(this.useCards)
+        this.sortAllUseCards()
       }
+    },
+    sortUseCards() {
+      this.UseCards = this.getNewUseCards(this.allUseCards)
+    },
+    sortAllUseCards() {
+      this.allUseCards = this.getNewAllUseCards(this.useCards)
     },
     getNewAllUseCards(useCards) {
       // 一覧で表示するカードの配列
