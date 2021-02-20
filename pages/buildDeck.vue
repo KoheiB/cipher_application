@@ -456,8 +456,8 @@ export default {
     // ▼ 検索ドロワーに関するメソッド ****************************************▼
     // フィルターを変更した時の処理
     resetSearchLoading() {
-      this.searchInfiniteId += 1
       this.searchedCards = []
+      this.searchInfiniteId += 1
       this.nextLoadSearchedCards = null
       this.lastLoadSearchedCard = null
     },
