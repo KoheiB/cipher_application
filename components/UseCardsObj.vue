@@ -32,6 +32,13 @@
     </div>
     <v-overlay absolute :value="isOverlay">
       <v-btn
+        color="blue-grey lighten-4"
+        style="text-transform: none"
+        height="30"
+        @click.stop="$emit('plus-btn-click')"
+        ><v-icon color="black">mdi-magnify</v-icon></v-btn
+      >
+      <v-btn
         color="blue-grey lighten-5"
         rounded
         small
