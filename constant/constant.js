@@ -684,27 +684,27 @@ const _unitNameItems = [
 ]
 
 const _symbolItems = [
-  { name: 'なし', color: 'cyan lighten-5', gradation: 'cyan-gradation' },
-  { name: '光の剣', color: 'red lighten-3', gradation: 'red-gradation' },
-  { name: '聖痕', color: 'blue lighten-4', gradation: 'blue-gradation' },
-  { name: '白夜', color: 'grey lighten-4', gradation: 'white-gradation' },
-  { name: '暗夜', color: 'grey lighten-1', gradation: 'black-gradation' },
+  { name: 'なし', color: 'cyan lighten-5', gradation: '#E0F7FA' },
+  { name: '光の剣', color: 'red lighten-3', gradation: '#EF9A9A' },
+  { name: '聖痕', color: 'blue lighten-4', gradation: '#BBDEFB' },
+  { name: '白夜', color: 'grey lighten-4', gradation: '#F5F5F5' },
+  { name: '暗夜', color: 'grey lighten-1', gradation: '#BDBDBD' },
   {
     name: 'メダリオン',
     color: 'green lighten-3',
-    gradation: 'green-gradation',
+    gradation: '#A5D6A7',
   },
   {
     name: '神器',
     color: 'deep-purple lighten-3',
-    gradation: 'purple-gradation',
+    gradation: '#B39DDB',
   },
   {
     name: '聖戦旗',
     color: 'yellow lighten-4',
-    gradation: 'yellow-gradation',
+    gradation: '#FFF9C4',
   },
-  { name: '女神紋', color: 'brown lighten-3', gradation: 'brown-gradation' },
+  { name: '女神紋', color: 'brown lighten-3', gradation: '#BCAAA4' },
 ]
 
 const _sortieCostItems = ['0', '1', '2', '3', '4', '5', '6', '7', 'X']

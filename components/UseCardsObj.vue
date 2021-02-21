@@ -19,11 +19,14 @@
         <span class="list-unit-name font-weight-bold">{{ unitName }}</span>
       </v-list-item-title>
     </v-list-item-content>
-    <v-list-item-avatar class="ma-0" tile height="38" width="72">
+    <div class="card-image-wrapper">
       <v-img :src="imageUrl" position="top">
-        <div class="fill-height red-gradation" />
+        <div
+          class="fill-height"
+          :style="{ backgroundImage: backgroundGradation }"
+        />
       </v-img>
-    </v-list-item-avatar>
+    </div>
     <div
       class="px-0 blue-grey darken-4 white--text font-weight-bold d-flex justify-center align-center"
       style="height: 38px; width: 38px"
@@ -35,7 +38,6 @@
         color="blue-grey lighten-4"
         style="text-transform: none"
         height="30"
-        @click.stop="$emit('plus-btn-click')"
         ><v-icon color="black">mdi-magnify</v-icon></v-btn
       >
       <v-btn
@@ -113,6 +115,9 @@ export default {
     isOverlay() {
       return this.cardId === this.overlayId
     },
+    backgroundGradation() {
+      return `linear-gradient(90deg, ${this.gradation} 0%, rgba(109, 213, 208, 0) 10%)`
+    },
   },
 }
 </script>
@@ -125,11 +130,9 @@ export default {
 .list-unit-name {
   font-size: 0.875rem;
 }
-.red-gradation {
-  background-image: linear-gradient(
-    90deg,
-    rgb(109, 213, 208) 30%,
-    rgba(109, 213, 208, 0) 70%
-  );
+.card-image-wrapper {
+  height: 38px;
+  width: 64px;
+  overflow: hidden;
 }
 </style>
