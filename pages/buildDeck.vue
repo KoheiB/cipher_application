@@ -228,6 +228,7 @@
         v-for="(card, index) in allUseCards"
         :key="'allUseCard-' + card.id + '-' + index"
         class="hidden-mobile-and-down"
+        :card-id="'allUseCard-' + card.id + '-' + index"
         :image-url="card.imageUrl"
       />
     </draggable>
@@ -387,13 +388,7 @@ export default {
         this.sortAllUseCards()
       }
     },
-    sortUseCards() {
-      this.useCards = this.getNewUseCards()
-    },
     sortAllUseCards() {
-      this.allUseCards = this.getNewAllUseCards()
-    },
-    getNewAllUseCards() {
       // 一覧で表示するカードの配列
       const result = []
       // 種類ごとにリスト表示するカードの配列を頭から探索
@@ -402,9 +397,9 @@ export default {
           result.push(cardObj.info)
         }
       })
-      return result
+      this.allUseCards = result
     },
-    getNewUseCards() {
+    sortUseCards() {
       const result = []
       // 画像一覧で表示するカードの配列を頭から探索
       this.allUseCards.forEach((card) => {
@@ -429,7 +424,7 @@ export default {
           result[cardObjIndex].count++
         }
       })
-      return result
+      this.useCards = result
     },
     // ▲ マイデッキビューに関するメソッド ****************************************▲
 

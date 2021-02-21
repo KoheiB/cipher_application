@@ -42,8 +42,8 @@
       >
       <v-btn
         color="blue-grey lighten-5"
-        rounded
         small
+        rounded
         @click.stop="$emit('use-card-obj-minus-btn-click')"
       >
         <v-icon color="red accent-4">mdi-minus</v-icon>
@@ -57,8 +57,8 @@
       >
       <v-btn
         color="blue-grey lighten-5"
-        rounded
         small
+        rounded
         @click.stop="$emit('use-card-obj-plus-btn-click')"
         ><v-icon color="light-blue accent-4">mdi-plus</v-icon></v-btn
       >
