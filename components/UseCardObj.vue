@@ -4,7 +4,7 @@
     :class="color"
     style="margin-bottom: 1px; min-height: 38px"
     :ripple="false"
-    @click="$emit('card-list-click', cardId)"
+    @click="$emit('use-card-obj-list-click', cardId)"
   >
     <div
       class="px-0 mx-1 blue-grey darken-3 white--text font-weight-bold rounded-xl d-flex justify-center align-center"
@@ -44,7 +44,7 @@
         color="blue-grey lighten-5"
         rounded
         small
-        @click.stop="$emit('minus-btn-click')"
+        @click.stop="$emit('use-card-obj-minus-btn-click')"
       >
         <v-icon color="red accent-4">mdi-minus</v-icon>
       </v-btn>
@@ -59,7 +59,7 @@
         color="blue-grey lighten-5"
         rounded
         small
-        @click.stop="$emit('plus-btn-click')"
+        @click.stop="$emit('use-card-obj-plus-btn-click')"
         ><v-icon color="light-blue accent-4">mdi-plus</v-icon></v-btn
       >
     </v-overlay>

@@ -254,9 +254,9 @@
           :image-url="card.info.imageUrl"
           :count="card.count"
           :overlay-id="overlayId"
-          @plus-btn-click="card.count++"
-          @minus-btn-click="removeCard(card)"
-          @card-list-click="changeCardCount"
+          @use-card-obj-plus-btn-click="incrementUseCardObjCount(card)"
+          @use-card-obj-minus-btn-click="decrementUseCardObjCount(card)"
+          @use-card-obj-list-click="changeCardCount"
         />
       </draggable>
     </v-list>
@@ -377,46 +377,41 @@ export default {
         // 配列の順序をreverseして、末尾から探索できるようにしておく
         // これにより、ドラッグして移動したカードが元より後ろの順で検知される
         this.allUseCards.reverse()
-        this.useCards = this.getNewUseCards(this.allUseCards)
+        this.sortUseCards()
         this.sortAllUseCards()
         // 逆順にしたものを元の順に戻す
         this.allUseCards.reverse()
       } else if (newIndex < oldIndex) {
         // 前にカードを移動した場合
-        this.useCards = this.getNewUseCards(this.allUseCards)
+        this.sortUseCards()
         this.sortAllUseCards()
       }
     },
     sortUseCards() {
-      this.UseCards = this.getNewUseCards(this.allUseCards)
+      this.useCards = this.getNewUseCards()
     },
     sortAllUseCards() {
-      this.allUseCards = this.getNewAllUseCards(this.useCards)
+      this.allUseCards = this.getNewAllUseCards()
     },
-    getNewAllUseCards(useCards) {
+    getNewAllUseCards() {
       // 一覧で表示するカードの配列
       const result = []
-
-      useCards.forEach((cardObj) => {
+      // 種類ごとにリスト表示するカードの配列を頭から探索
+      this.useCards.forEach((cardObj) => {
         for (let i = 0; i < cardObj.count; ++i) {
           result.push(cardObj.info)
         }
       })
       return result
     },
-    getNewUseCards(allUseCards) {
-      // 各カードがどの順で何枚入っているかを格納する配列
-      // obj{ img: String, count: Int}[]
+    getNewUseCards() {
       const result = []
-
-      // カードの配列を頭から探索
-      allUseCards.forEach((card) => {
+      // 画像一覧で表示するカードの配列を頭から探索
+      this.allUseCards.forEach((card) => {
         // 種類順の配列(result)にあるカードかどうか、オブジェクトのimgキーを参照して確認する
         const cardExists =
           result.filter((cardObj) => {
-            if (cardObj) {
-              return cardObj.info.id === card.id
-            }
+            return cardObj.info.id === card.id
           })[0] !== undefined
 
         // 種類順の配列に含まれているかどうか
@@ -557,9 +552,7 @@ export default {
 
       const cardExists =
         this.useCards.filter((cardObj) => {
-          if (cardObj) {
-            return cardObj.info.id === result.info.id
-          }
+          return cardObj.info.id === result.info.id
         })[0] !== undefined
       if (!cardExists) {
         this.useCards.push(result)
@@ -569,28 +562,33 @@ export default {
         )
         this.useCards[cardObjIndex].count++
       }
-      this.allUseCards = this.getNewAllUseCards(this.useCards)
+      this.sortAllUseCards()
     },
     addFourCards(card) {
       for (let i = 0; i < 4; i++) {
         this.addCard(card)
       }
     },
-    removeCard(card) {
+    incrementUseCardObjCount(card) {
+      card.count++
+      this.sortAllUseCards()
+    },
+    decrementUseCardObjCount(card) {
       card.count--
       const i = this.useCards.indexOf(card)
       if (card.count === 0) {
         this.useCards.splice(i, 1)
         this.overlayId = null
       }
+      this.sortAllUseCards()
     },
-    changeCardCount(id) {
-      if (this.overlayId === id) {
+    changeCardCount(cardId) {
+      // オーバーレイのON/OFFを状態により分岐
+      if (this.overlayId === cardId) {
         this.overlayId = null
       } else {
-        this.overlayId = id
+        this.overlayId = cardId
       }
-      this.allUseCards = this.getNewAllUseCards(this.useCards)
     },
   },
 }
