@@ -6,28 +6,34 @@
                 - deckName : String
                 - UseCards : SubCollection
                   - DocumentId : Cards.DocumentId
-                    - cardId : String
-                    - title : String
-                    - unitName : String
-                    - symbols : Array[String]
+                    - info :Map
+                      - id : String
+                      - recording : String 
+                      - title : String
+                      - unitName : String
+                      - symbols : Array[String]
                     - count : Number
                     - displayOrder : Number
                 - heroCard : Map
-                  - cardId : String
+                  - id : String
+                  - recording : String 
                   - title : String
                   - unitName : String
                   - symbols : Array[String]
                 - mainClassChangeCard : Map
-                  - cardId : String
+                  - id : String
+                  - recording : String 
                   - title : String
                   - unitName : String
                   - symbols : Array[String]
                 - MarkCards : SubCollection
                   - DocumentId : Cards.DocumentId
-                    - cardId : String
-                    - title : String
-                    - unitName : String
-                    - symbols : Array[String]
+                    - info :Map
+                      - id : String
+                      - recording : String 
+                      - title : String
+                      - unitName : String
+                      - symbols : Array[String]
                     - count : Number
                     - displayOrder : Number
                 - isPublic : Boolean
@@ -48,9 +54,9 @@
         - updatedAt : Timestamp
 
 - Cards : Collectioon
-    <!-- スキルテキスト以外は楽にimportできたのでモデルにもフィールドを追加しておきました。 -->
     - DocumentId : cardId + rare (ex.B01-001SR+)
-      - card_no : String
+      - id : String
+      - no : String
       - rare: String
       - recording: String
       - title: String

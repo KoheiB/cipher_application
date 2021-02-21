@@ -1,7 +1,7 @@
 <template>
   <div class="card-wrapper">
     <v-card style="margin: 1px">
-      <v-img :src="img" />
+      <v-img :src="imageUrl" />
     </v-card>
   </div>
 </template>
@@ -9,7 +9,7 @@
 <script>
 export default {
   props: {
-    img: {
+    imageUrl: {
       type: String,
       required: true,
     },
