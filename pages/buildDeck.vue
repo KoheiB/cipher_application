@@ -166,7 +166,7 @@
                     outlined
                     width="100%"
                     small
-                    @click="useCards.push(card)"
+                    @click="groupedUseCards.push(card)"
                     >１枚追加</v-btn
                   >
                   <v-btn class="mb-1" outlined width="100%" small
@@ -234,15 +234,15 @@
     </draggable>
     <v-list>
       <draggable
-        v-model="useCards"
-        group="useCards"
+        v-model="groupedUseCards"
+        group="groupedUseCards"
         :animation="200"
         @start="drag = true"
         @end="drag = false"
         @change="sortAllUseCards"
       >
         <UseCardObj
-          v-for="card in useCards"
+          v-for="card in groupedUseCards"
           :key="'useCard-' + card.info.id"
           class="d-mobile-none"
           :card-id="card.info.id"
@@ -281,7 +281,7 @@ export default {
   data() {
     return {
       deckName: '',
-      useCards: [],
+      groupedUseCards: [],
       allUseCards: [],
       keepCards: [],
       useCardsRef: '',
@@ -323,7 +323,7 @@ export default {
           .doc()
           .collection('UseCards')
       }
-      this.useCards.forEach((cardObj, index) => {
+      this.groupedUseCards.forEach((cardObj, index) => {
         const card = cardObj.info
         this.useCardsRef.doc().set(
           {
@@ -360,7 +360,7 @@ export default {
         }
         return result
       })
-      this.useCards = data
+      this.groupedUseCards = data
       alert('loaded')
     },
     shareDeck() {
@@ -392,7 +392,7 @@ export default {
       // 一覧で表示するカードの配列
       const result = []
       // 種類ごとにリスト表示するカードの配列を頭から探索
-      this.useCards.forEach((cardObj) => {
+      this.groupedUseCards.forEach((cardObj) => {
         for (let i = 0; i < cardObj.count; ++i) {
           result.push(cardObj.info)
         }
@@ -424,7 +424,7 @@ export default {
           result[cardObjIndex].count++
         }
       })
-      this.useCards = result
+      this.groupedUseCards = result
     },
     // ▲ マイデッキビューに関するメソッド ****************************************▲
 
@@ -520,7 +520,7 @@ export default {
     // ▲ 検索ドロワーに関するメソッド ****************************************▲
 
     // TODOisMarked(card) {
-    //   const result = this.useCards.filter((myDeckCard) => {
+    //   const result = this.groupedUseCards.filter((myDeckCard) => {
     //     return card
     //   })
     //   if (result.length !== 0) {
@@ -546,16 +546,16 @@ export default {
       }
 
       const cardExists =
-        this.useCards.filter((cardObj) => {
+        this.groupedUseCards.filter((cardObj) => {
           return cardObj.info.id === result.info.id
         })[0] !== undefined
       if (!cardExists) {
-        this.useCards.push(result)
+        this.groupedUseCards.push(result)
       } else {
-        const cardObjIndex = this.useCards.findIndex(
+        const cardObjIndex = this.groupedUseCards.findIndex(
           (cardObj) => cardObj.info.id === card.id
         )
-        this.useCards[cardObjIndex].count++
+        this.groupedUseCards[cardObjIndex].count++
       }
       this.sortAllUseCards()
     },
@@ -570,9 +570,9 @@ export default {
     },
     decrementUseCardObjCount(card) {
       card.count--
-      const i = this.useCards.indexOf(card)
+      const i = this.groupedUseCards.indexOf(card)
       if (card.count === 0) {
-        this.useCards.splice(i, 1)
+        this.groupedUseCards.splice(i, 1)
         this.overlayId = null
       }
       this.sortAllUseCards()
