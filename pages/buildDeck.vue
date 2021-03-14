@@ -287,6 +287,7 @@ import {
   sortieCostItems,
 } from '../constant/constant'
 export default {
+  middleware: 'authenticated',
   components: {
     draggable,
     InfiniteLoading,
