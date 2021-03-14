@@ -7,19 +7,25 @@
           <v-fade-transition>
             <v-overlay v-show="hover" absolute>
               <v-layout column>
-                <v-btn color="blue-grey lighten-4" x-small
+                <v-btn
+                  color="blue-grey lighten-4"
+                  x-small
+                  @click="$emit('use-card-expansion-btn-click')"
+                >
                   ><v-icon color="black">mdi-magnify</v-icon></v-btn
                 >
                 <v-btn
                   class="align-self-end"
                   color="blue-grey lighten-5"
                   x-small
+                  @click="$emit('use-card-plus-btn-click')"
                   ><v-icon color="light-blue accent-4">mdi-plus</v-icon></v-btn
                 >
                 <v-btn
                   class="align-self-end"
                   color="blue-grey lighten-5"
                   x-small
+                  @click="$emit('use-card-minus-btn-click')"
                   ><v-icon color="red accent-4">mdi-minus</v-icon></v-btn
                 >
               </v-layout>

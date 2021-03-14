@@ -166,7 +166,7 @@
                     outlined
                     width="100%"
                     small
-                    @click="groupedUseCards.push(card)"
+                    @click="listViewCards.push(card)"
                     >１枚追加</v-btn
                   >
                   <v-btn class="mb-1" outlined width="100%" small
@@ -216,17 +216,17 @@
       </v-layout>
     </v-container>
     <draggable
-      v-model="allUseCards"
+      v-model="imageViewCards"
       class="d-flex flex-wrap"
-      group="allUseCards"
+      group="imageViewCards"
       :animation="200"
       @start="drag = true"
       @end="drag = false"
-      @change="groupAllUseCards"
+      @change="moveSameCards"
     >
       <UseCard
-        v-for="(card, index) in allUseCards"
-        :key="'allUseCard-' + card.id + '-' + index"
+        v-for="(card, index) in imageViewCards"
+        :key="'imageView-' + card.id + '-' + index"
         class="hidden-mobile-and-down"
         :card-id="'allUseCard-' + card.id + '-' + index"
         :image-url="card.imageUrl"
@@ -234,16 +234,16 @@
     </draggable>
     <v-list>
       <draggable
-        v-model="groupedUseCards"
-        group="groupedUseCards"
+        v-model="listViewCards"
+        group="listViewCards"
         :animation="200"
         @start="drag = true"
         @end="drag = false"
-        @change="sortAllUseCards"
+        @change="sortImageViewCards"
       >
         <UseCardObj
-          v-for="card in groupedUseCards"
-          :key="'useCard-' + card.info.id"
+          v-for="card in listViewCards"
+          :key="'listView-' + card.info.id"
           class="d-mobile-none"
           :card-id="card.info.id"
           :title="card.info.title"
@@ -281,8 +281,8 @@ export default {
   data() {
     return {
       deckName: '',
-      groupedUseCards: [],
-      allUseCards: [],
+      listViewCards: [],
+      imageViewCards: [],
       keepCards: [],
       useCardsRef: '',
       overlayId: null,
@@ -323,7 +323,7 @@ export default {
           .doc()
           .collection('UseCards')
       }
-      this.groupedUseCards.forEach((cardObj, index) => {
+      this.listViewCards.forEach((cardObj, index) => {
         const card = cardObj.info
         this.useCardsRef.doc().set(
           {
@@ -360,7 +360,7 @@ export default {
         }
         return result
       })
-      this.groupedUseCards = data
+      this.listViewCards = data
       alert('loaded')
     },
     shareDeck() {
@@ -369,7 +369,7 @@ export default {
     // ▼ マイデッキビューに関するメソッド ****************************************▼
     // 1枚のカードをドラッグした際、同じ種類のカードの順序をまとめて入れ替えるためのメソッド
     // 一旦、カードの配列を各カードの順序と枚数の情報に変換して並べなおす
-    groupAllUseCards(event) {
+    moveSameCards(event) {
       const newIndex = event.moved.newIndex
       const oldIndex = event.moved.oldIndex
 
@@ -377,32 +377,32 @@ export default {
         // 後ろにカードを移動した場合
         // 配列の順序をreverseして、末尾から探索できるようにしておく
         // これにより、ドラッグして移動したカードが元より後ろの順で検知される
-        this.allUseCards.reverse()
-        this.sortUseCards()
-        this.sortAllUseCards()
+        this.imageViewCards.reverse()
+        this.sortListViewCards()
+        this.sortImageViewCards()
         // 逆順にしたものを元の順に戻す
-        this.allUseCards.reverse()
+        this.imageViewCards.reverse()
       } else if (newIndex < oldIndex) {
         // 前にカードを移動した場合
-        this.sortUseCards()
-        this.sortAllUseCards()
+        this.sortListViewCards()
+        this.sortImageViewCards()
       }
     },
-    sortAllUseCards() {
+    sortImageViewCards() {
       // 一覧で表示するカードの配列
       const result = []
       // 種類ごとにリスト表示するカードの配列を頭から探索
-      this.groupedUseCards.forEach((cardObj) => {
+      this.listViewCards.forEach((cardObj) => {
         for (let i = 0; i < cardObj.count; ++i) {
           result.push(cardObj.info)
         }
       })
-      this.allUseCards = result
+      this.imageViewCards = result
     },
-    sortUseCards() {
+    sortListViewCards() {
       const result = []
       // 画像一覧で表示するカードの配列を頭から探索
-      this.allUseCards.forEach((card) => {
+      this.imageViewCards.forEach((card) => {
         // 種類順の配列(result)にあるカードかどうか、オブジェクトのimgキーを参照して確認する
         const cardExists =
           result.filter((cardObj) => {
@@ -424,7 +424,7 @@ export default {
           result[cardObjIndex].count++
         }
       })
-      this.groupedUseCards = result
+      this.listViewCards = result
     },
     // ▲ マイデッキビューに関するメソッド ****************************************▲
 
@@ -520,7 +520,7 @@ export default {
     // ▲ 検索ドロワーに関するメソッド ****************************************▲
 
     // TODOisMarked(card) {
-    //   const result = this.groupedUseCards.filter((myDeckCard) => {
+    //   const result = this.listViewCards.filter((myDeckCard) => {
     //     return card
     //   })
     //   if (result.length !== 0) {
@@ -546,18 +546,18 @@ export default {
       }
 
       const cardExists =
-        this.groupedUseCards.filter((cardObj) => {
+        this.listViewCards.filter((cardObj) => {
           return cardObj.info.id === result.info.id
         })[0] !== undefined
       if (!cardExists) {
-        this.groupedUseCards.push(result)
+        this.listViewCards.push(result)
       } else {
-        const cardObjIndex = this.groupedUseCards.findIndex(
+        const cardObjIndex = this.listViewCards.findIndex(
           (cardObj) => cardObj.info.id === card.id
         )
-        this.groupedUseCards[cardObjIndex].count++
+        this.listViewCards[cardObjIndex].count++
       }
-      this.sortAllUseCards()
+      this.sortImageViewCards()
     },
     addFourCards(card) {
       for (let i = 0; i < 4; i++) {
@@ -566,16 +566,16 @@ export default {
     },
     incrementUseCardObjCount(card) {
       card.count++
-      this.sortAllUseCards()
+      this.sortImageViewCards()
     },
     decrementUseCardObjCount(card) {
       card.count--
-      const i = this.groupedUseCards.indexOf(card)
+      const i = this.listViewCards.indexOf(card)
       if (card.count === 0) {
-        this.groupedUseCards.splice(i, 1)
+        this.listViewCards.splice(i, 1)
         this.overlayId = null
       }
-      this.sortAllUseCards()
+      this.sortImageViewCards()
     },
     changeCardCount(cardId) {
       // オーバーレイのON/OFFを状態により分岐
