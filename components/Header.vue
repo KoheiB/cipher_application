@@ -32,11 +32,11 @@
         <v-menu offset-y>
           <template v-slot:activator="{ on }">
             <v-btn style="text-transform: none" text v-on="on">
-              <v-img
+              <!-- <v-img
                 :src="$store.getters.user.providerData[0].photoURL"
                 position="top"
-              />
-              <!-- <v-icon> mdi-account</v-icon> -->
+              /> -->
+              <v-icon> mdi-account</v-icon>
             </v-btn>
           </template>
           <v-list>
