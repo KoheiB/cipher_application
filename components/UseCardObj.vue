@@ -10,15 +10,8 @@
       class="px-0 mx-1 blue-grey darken-3 white--text font-weight-bold rounded-xl d-flex justify-center align-center"
       style="width: 30px; height: 30px"
     >
-      <span style="font-size: 16px">{{ sortieCost }}</span>
+      <span style="font-size: 16px">{{ sortieCost }}c</span>
     </div>
-    <v-list-item-content class="py-0 d-flex flex-nowrap" style="height: 38px">
-      <v-list-item-title>
-        <span class="list-title font-weight-bold">{{ title }}</span>
-        <br />
-        <span class="list-unit-name font-weight-bold">{{ unitName }}</span>
-      </v-list-item-title>
-    </v-list-item-content>
     <div class="card-image-wrapper">
       <v-img :src="imageUrl" position="top">
         <div
@@ -27,13 +20,45 @@
         />
       </v-img>
     </div>
+    <v-list-item-content class="py-0 d-flex flex-nowrap" style="height: 38px">
+      <v-list-item-title v-show="!isOverlay">
+        <span class="list-title font-weight-bold">{{ title }}</span>
+        <br />
+        <span class="list-unit-name font-weight-bold">{{ unitName }}</span>
+      </v-list-item-title>
+      <v-layout v-show="isOverlay" justify-space-around>
+        <v-btn
+          color="blue-grey lighten-4"
+          style="text-transform: none"
+          height="30"
+          x-small
+          @click.stop="$emit('use-card-obj-expansion-btn-click')"
+          ><v-icon color="black">mdi-magnify</v-icon></v-btn
+        >
+        <v-btn
+          color="blue-grey lighten-5"
+          small
+          rounded
+          @click.stop="$emit('use-card-obj-minus-btn-click')"
+        >
+          <v-icon color="red accent-4">mdi-minus</v-icon>
+        </v-btn>
+        <v-btn
+          color="blue-grey lighten-5"
+          small
+          rounded
+          @click.stop="$emit('use-card-obj-plus-btn-click')"
+          ><v-icon color="light-blue accent-4">mdi-plus</v-icon></v-btn
+        >
+      </v-layout>
+    </v-list-item-content>
     <div
       class="px-0 blue-grey darken-4 white--text font-weight-bold d-flex justify-center align-center"
       style="height: 38px; width: 38px"
     >
       <span style="font-size: 16px">x{{ count }}</span>
     </div>
-    <v-overlay absolute :value="isOverlay">
+    <!-- <v-overlay absolute :value="isOverlay">
       <v-btn
         color="blue-grey lighten-4"
         style="text-transform: none"
@@ -62,7 +87,7 @@
         @click.stop="$emit('use-card-obj-plus-btn-click')"
         ><v-icon color="light-blue accent-4">mdi-plus</v-icon></v-btn
       >
-    </v-overlay>
+    </v-overlay> -->
   </v-list-item>
 </template>
 
@@ -116,7 +141,7 @@ export default {
       return this.cardId === this.overlayId
     },
     backgroundGradation() {
-      return `linear-gradient(90deg, ${this.gradation} 0%, rgba(109, 213, 208, 0) 10%)`
+      return `linear-gradient(270deg, ${this.gradation} 0%, rgba(109, 213, 208, 0) 10%)`
     },
   },
 }
