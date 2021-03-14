@@ -19,7 +19,8 @@
     "fs": "^0.0.1-security",
     "nuxt": "^2.14.12",
     "vue-infinite-loading": "^2.4.5",
-    "vuedraggable": "^2.24.3"
+    "vuedraggable": "^2.24.3",
+    "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^3.1.0",

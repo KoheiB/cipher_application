@@ -27,13 +27,16 @@
       </v-btn-toggle>
     </v-toolbar-items>
 
-    <div v-show="isLogin" class="ml-5">
+    <div v-show="this.$store.getters.isAuthenticated" class="ml-5">
       <v-toolbar-items>
         <v-menu offset-y>
           <template v-slot:activator="{ on }">
             <v-btn style="text-transform: none" text v-on="on">
-              <v-icon> mdi-account</v-icon>
-              {{ user.name }}
+              <v-img
+                :src="$store.getters.user.providerData[0].photoURL"
+                position="top"
+              />
+              <!-- <v-icon> mdi-account</v-icon> -->
             </v-btn>
           </template>
           <v-list>
@@ -59,12 +62,8 @@
         </v-menu>
       </v-toolbar-items>
     </div>
-    <div v-show="!isLogin" class="mx-5">
-      <v-btn small class="primary" @click="regist">
-        <v-icon>mdi-account-plus</v-icon>
-        <span class="hidden-ipad-and-down">新規登録</span>
-      </v-btn>
-      <v-btn small class="info" @click="login">
+    <div v-show="!this.$store.getters.isAuthenticated" class="mx-5">
+      <v-btn small nuxt to="login" class="info">
         <v-icon>mdi-login</v-icon>
         <span class="hidden-ipad-and-down">ログイン</span>
       </v-btn>
@@ -74,19 +73,9 @@
 
 <script>
 export default {
-  props: {
-    loginUser: {
-      type: Array,
-      required: false,
-    },
-
-    isLogin: {
-      type: Boolean,
-      required: true,
-    },
-  },
   data() {
     return {
+      isLogin: false,
       user: {
         name: 'buruso3',
       },
@@ -97,17 +86,18 @@ export default {
         },
         {
           label: 'Logout',
-          method: () => this.logout(),
+          method: () => this.signOut(),
         },
       ],
     }
   },
   methods: {
-    login() {
-      this.$emit('login')
-    },
-    logout() {
-      this.$emit('logout')
+    signOut() {
+      this.$store.dispatch('signOut').then(() => {
+        this.$router.push({
+          name: 'index',
+        })
+      })
     },
   },
 }
